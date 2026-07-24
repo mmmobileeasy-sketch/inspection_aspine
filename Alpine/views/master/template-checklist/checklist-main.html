@@ -1,0 +1,225 @@
+<!-- คัดลอกตั้งแต่บรรทัดนี้เป็นต้นไป ไปวางในฝั่งพื้นที่เนื้อหาขวาของคุณ -->
+<div class="inspection-container"
+    style="padding: 1.5rem; background-color: #f3f4f6; min-height: 100vh; font-family: sans-serif;">
+
+    <!-- แทรก Script ป้องกันแบบ Double-Lock เผื่อหน้าหลักไม่มี <head> -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- บังคับโหลดสคริปต์สลับแท็บ Alpine.js แบบไม่หน่วงเวลา (นำไปวางบรรทัดแรกสุดของโค้ดชิ้นนี้) -->
+
+
+    <!-- สไตล์สำรองฉุกเฉิน กรณี Tailwind CDN ไม่โหลด หน้าจอจะยังคงเป็นบล็อกสวยงาม -->
+    <style>
+        .custom-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding-bottom: 8px;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-active-teal {
+            color: #0d9488;
+            font-weight: 600;
+            border-bottom: 2px solid #0d9488;
+        }
+
+        .tab-active-amber {
+            color: #f59e0b;
+            font-weight: 600;
+            border-bottom: 2px solid #f59e0b;
+        }
+
+        .tab-active-red {
+            color: #ef4444;
+            font-weight: 600;
+            border-bottom: 2px solid #ef4444;
+        }
+
+        .flex-row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-green {
+            background-color: #10b981;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .search-box {
+            border: 1px solid #d1d5db;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 240px;
+        }
+
+        .data-table {
+            w-full text-left border-collapse text-sm
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f9fafb;
+            color: #6b7280;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            min-width: 80px;
+        }
+
+        .status-active {
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-inactive {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+    </style>
+
+    <!-- กล่องหลักคุมระบบด้วย Alpine.js -->
+    <div x-data="{ 
+        currentTab: 'type', 
+        searchQuery: '',
+        answers: [
+            { code: 'ANS-01', name: 'ชุดมาตรฐาน ผ่าน / ไม่ผ่าน (Yes / No)', type: 'ตัวเลือก', icon: 'fa-circle-dot', options: '2 ตัวเลือก', active: true },
+            { code: 'ANS-02', name: 'ชุดประเมินงานแม่บ้าน 5 ระดับ (ความสะอาด)', type: 'ตัวเลือก', icon: 'fa-circle-dot', options: '5 ตัวเลือก', active: false },
+            { code: 'ANS-03', name: 'ชุดตรวจวัดอุณหภูมิตู้หลัก MDB (องศา)', type: 'กรอกตัวเลข', icon: 'fa-keyboard', options: '20 - 45', active: true }
+        ],
+        get filteredAnswers() {
+            return this.answers.filter(item => item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || item.code.toLowerCase().includes(this.searchQuery.toLowerCase()))
+        }
+    }" class="custom-card max-w-6xl mx-auto bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-gray-700">
+
+        <!-- แถบเมนูสลับแท็บ (Tabs) -->
+        <!-- แถบเมนูสลับแท็บ (Tabs) -->
+        <div class="tab-bar flex items-center space-x-6 border-b border-gray-200 pb-4 mb-6">
+            <button onclick="loadTab('tab-type.html','btn-type' )" id="btn-type"
+                class="tab-btn pb-2 flex items-center space-x-2 transition cursor-pointer tab-active-teal text-teal-600 border-b-2 border-teal-600 font-semibold">
+                <i class="fa-solid fa-list-check"></i> <span>ประเภทคำตอบ</span>
+            </button>
+            <button onclick="loadTab('tab-group.html', 'btn-group')" id="btn-group"
+                class="tab-btn pb-2 flex items-center space-x-2 transition cursor-pointer">
+                <i class="fa-solid fa-folder-open"></i> <span>หมวดหมู่คำถาม (ผูกคำตอบ)</span>
+            </button>
+            <button onclick="loadTab('question')" id="btn-question"
+                class="tab-btn pb-2 flex items-center space-x-2 transition cursor-pointer">
+                <i class="fa-solid fa-clipboard-question"></i> <span>คำถาม (ผูก Work Type)</span>
+            </button>
+        </div>
+
+        <!-- กล่องเปล่าสำหรับรองรับเนื้อหาจากไฟล์อื่นมาแสดง โค้ดจะไม่บวมอีกต่อไป -->
+<div id="tab-content-container">
+    <!-- เนื้อหาจากไฟล์ภายนอกจะมาโผล่ตรงนี้อัตโนมัติ -->
+</div>
+
+       
+
+
+           
+
+           <script>
+// ฟังก์ชันโหลดไฟล์ HTML ภายนอกมาแสดงผล
+function loadTab(fileName, buttonId) {
+    const container = document.getElementById('tab-content-container');
+    
+    // โหลดไฟล์ด้วยคำสั่ง fetch
+    
+    fetch(fileName)
+        .then(response => {
+            if (!response.ok) throw new Error('หาไฟล์ไม่เจอ');
+            return response.text();
+        })
+        .then(html => {
+            // นำเนื้อหาในไฟล์มาใส่ในกล่องหลัก
+            container.innerHTML = html;
+            
+            // สลับสีไฮไลท์ที่ปุ่มแท็บ
+            const buttons = ['btn-type', 'btn-group'];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.className = "tab-btn pb-2 flex items-center space-x-2 transition cursor-pointer";
+            });
+            
+            // ไฮไลท์ปุ่มที่กดเลือกให้เป็นสีตามธีม
+            const activeBtn = document.getElementById(buttonId);
+            if (buttonId === 'btn-type') {
+                activeBtn.className = "tab-btn pb-2 flex items-center space-x-2 transition cursor-pointer tab-active-teal text-teal-600 border-b-2 border-teal-600 font-semibold";
+            } else if (buttonId === 'btn-group') {
+                activeBtn.className = "tab-btn pb-2 flex items-center space-x-2 transition cursor-pointer tab-active-amber text-amber-500 border-b-2 border-amber-500 font-semibold";
+            }
+        })
+        .catch(error => {
+            container.innerHTML = `<div style="padding:20px; color:red; text-align:center;">เกิดข้อผิดพลาด: ไม่สามารถโหลดหน้าจอได้</div>`;
+        });
+}
+
+// สั่งให้โหลดหน้าแรก (tab-type.html) ขึ้นมาแสดงทันทีเมื่อเปิดเว็บครั้งแรก
+document.addEventListener("DOMContentLoaded", function() {
+    loadTab('tab-type.html', 'btn-type');
+});
+</script>
+

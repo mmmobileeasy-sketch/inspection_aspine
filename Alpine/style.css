@@ -1,0 +1,301 @@
+ 
+/* ตั้งค่าฟอนต์สารบรรณให้ทุกหน้าตามโจทย์แรกของคุณ */
+body {
+    margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+}
+
+/* 🎯 โซนสร้างคลาสส่วนกลางสำหรับให้ทุกหน้าดึงไป Reuse */
+
+/* 1. คลาสปุ่มกดหลักของระบบแอป (ดึงคำสั่ง Tailwind มารวมกัน) */
+.app-btn-primary {
+    @apply bg-blue-600 text-white font-medium px-5 py-2.5 rounded-lg shadow-sm hover:bg-blue-700 active:scale-98 transition duration-150;
+}
+
+/* 2. คลาสปุ่มกดสีแดงสำหรับปุ่มยกเลิก หรือออกจากระบบ */
+.app-btn-danger {
+    @apply bg-rose-600 text-white font-medium px-5 py-2.5 rounded-lg shadow-sm hover:bg-rose-700 active:scale-98 transition duration-150;
+}
+
+/* 3. คลาสกล่องการ์ดมาตรฐานของแอปหลังบ้าน */
+.app-card {
+    @apply bg-white p-5 rounded-xl border border-slate-100 shadow-xs;
+}
+
+
+
+
+
+  
+
+        /* 1. โครงสร้างเมนูฝั่งซ้ายมือ (Sidebar) */
+        .sidebar {
+            width: 260px;
+            /* ขนาดปกติเมื่อขยาย */
+            background-color: #1e293b;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px 16px;
+            box-sizing: border-box;
+            transition: width 0.3s ease, padding 0.3s ease;
+            /* แอนิเมชันตอนยืดหด */
+            overflow: hidden;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* คลาสสไตล์เมื่อเมนูถูก หด (Collapsed) */
+        .sidebar.collapsed {
+            width: 70px;
+            padding: 24px 8px;
+        }
+
+        /* ปุ่มสำหรับกด ยืด-หด เมนู */
+        .toggle-btn {
+            background-color: #334155;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .toggle-btn:hover {
+            background-color: #475569;
+        }
+
+        .sidebar-brand {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #334155;
+            margin-bottom: 15px;
+        }
+
+        /* ซ่อนตัวหนังสือแบรนด์เมื่อหดเมนู */
+        .sidebar.collapsed .brand-text {
+            display: none;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #cbd5e1;
+            transition: all 0.2s;
+        }
+
+        .menu-item:hover {
+            background-color: #334155;
+            color: #ffffff;
+        }
+
+        .menu-item.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* จัดไอคอนให้อยู่ตรงกลางและซ่อนข้อความเมนูเมื่อหด */
+        .sidebar.collapsed .menu-item {
+            justify-content: center;
+            padding: 14px 0;
+            gap: 0;
+        }
+
+        .sidebar.collapsed .menu-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .menu-icon {
+            font-size: 18px;
+        }
+
+        .btn-logout {
+            background-color: #334155;
+            color: #ef4444;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            width: 100%;
+            transition: 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: #fecaca;
+        }
+
+        .sidebar.collapsed .btn-logout {
+            font-size: 18px;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .logout-text {
+            display: none;
+        }
+
+        /* 2. พื้นที่แสดงเนื้อหาฝั่งขวามือ (Main Content) */
+        .main-content {
+            flex-grow: 1;
+            padding: 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .user-profile {
+            font-size: 12px;
+            color: #4b5563;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* 3. การ์ดตัวเลขสรุปภาพรวม (Responsive Grid) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        /* 4. ตารางข้อมูล Defect พร้อมระบบ Scroll แนวนอนเมื่อจอแคบ */
+        .table-card {
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 500px;
+        }
+
+        th {
+            background-color: #f9fafb;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #4b5563;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #111827;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-progress {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+
+        .badge-success {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+    

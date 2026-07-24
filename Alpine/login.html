@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condo Inspection System</title>
+    <!-- ดีไซน์สไตล์ CSS แท้ ปรับแต่งปุ่มใหญ่ สีสันโมเดิร์นให้ช่างหน้างานใช้คล่อง -->
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .app-container {
+            max-width: 450px;
+            width: 100%;
+            background: #ffffff;
+            min-height: 90vh;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .text-center { text-align: center; }
+        .title { font-size: 26px; font-weight: bold; color: #1f2937; margin: 0 0 8px 0; }
+        .subtitle { font-size: 13px; color: #6b7280; margin: 0 0 24px 0; }
+        .card {
+            background: #f9fafb;
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+        .input-group { margin-bottom: 20px; }
+        .label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px; }
+        .input-text {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 15px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-text:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .btn-blue {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+            transition: all 0.2s;
+        }
+        .btn-blue:hover { background: #1d4ed8; }
+        .btn-green { background: #16a34a; color: white; font-size: 13px; font-weight: bold; padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; }
+        .btn-logout { background: #f3f4f6; color: #dc2626; font-size: 12px; font-weight: 600; padding: 8px 14px; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; }
+        .defect-item { background: white; border: 1px solid #e5e7eb; border-radius: 14px; padding: 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .img-preview-box { position: relative; width: 100%; border-radius: 14px; overflow: hidden; background: #000000; text-align: center; margin-top: 12px; cursor: crosshair; line-height: 0; }
+        .pin { position: absolute; background: #dc2626; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; transform: translate(-50%, -50%); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .alert-info { font-size: 12px; color: #9ca3af; text-align: center; margin-top: 16px; line-height: 1.5; }
+    </style>
+
+   
+      <!-- 2. ไฟล์ CSS หลักของคุณ -->
+    <link rel="stylesheet" href="style.css">
+    <script defer src="https://jsdelivr.net"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- [หน้าจอที่ 1: ส่วนทางเข้า LOGIN] -->
+        <div id="loginPage" style="margin: auto 0; width: 100%;">
+            <div class="text-center">
+                <h1 class="title">🏢 ระบบตรวจคอนโด</h1>
+                <p class="subtitle">โหมดออฟไลน์หน้าไซต์งาน สเปกเบาเครื่องช่าง</p>
+            </div>
+
+            <div class="card">
+                <div class="input-group">
+                    <label class="label">ชื่อผู้ใช้งาน (Username)</label>
+                    <input type="text"  x-model="username" id="user" class="input-text" placeholder="พิมพ์ชื่อผู้ใช้ เช่น admin">
+                </div>
+                <div class="input-group">
+                    <label class="label">รหัสผ่าน (Password)</label>
+                    <input type="password" x-model="password" id="pass" class="input-text" placeholder="พิมพ์รหัสผ่าน เช่น 1234">
+                </div>
+                <button @click="handleLogin()" class="btn-blue">🔓 เข้าสู่ระบบ</button>
+            </div>
+            <p class="alert-info">💡 ทดสอบเข้าใช้งานจริง<br>พิมพ์ชื่อผู้ใช้: <b>admin</b> | รหัสผ่าน: <b>1234</b></p>
+        </div>
+
+        <!-- [หน้าจอที่ 2: ส่วนจัดการเก็บข้อมูลบันทึกคอนโด] -->
+        <div id="mainPage" style="display: none; width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 14px; margin-bottom: 24px;">
+                <div>
+                    <h2 style="margin: 0; font-size: 19px; color: #1f2937;">ห้อง 701 (เดินตรวจ)</h2>
+                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #2563eb; font-weight: 600;">วิศวกรผู้คุม: <span id="inspectorName"></span></p>
+                </div>
+                <button onclick="triggerLogout()" class="btn-logout">ออกจากระบบ</button>
+
+
+
+
+
+                  <!-- สคริปต์กลไกจำลองตัวรับสถานะให้สลับหน้าจอได้ โดยไม่พึ่งสคริปต์ภายนอกเว็บ -->
+    <script>
+       
+        function triggerLogout() {
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('pass').value = '';
+            document.getElementById('listArea').innerHTML = '<div id="emptyText" style="text-align: center; padding: 24px; color: #9ca3af; font-size: 13px;">ยังไม่มีรายการค้างส่ง ช่างเดินตรวจและเพิ่มจุดข้างบนได้เลย</div>';
+            document.getElementById('counter').innerText = '0';
+            document.getElementById('btnSubmitAPI').style.display = 'none';
+            resetForm();
+        }
+        function loadPhoto(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(evt) {
+                var img = new Image();
+                img.src = evt.target.result;
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = 400; canvas.height = 300;
+                    canvas.getContext('2d').drawImage(img, 0, 0, 400, 300);
+                    document.getElementById('previewImg').src = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('previewBox').style.display = 'block';
+                    movePin(50, 50);
+                }
+            }
+        }
+        function clickPhoto(e) {
+            var rect = e.target.getBoundingClientRect();
+            var x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+            var y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+            movePin(x, y);
+        }
+        var currentX = 50, currentY = 50;
+        function movePin(x, y) {
+            currentX = x; currentY = y;
+            var pin = document.getElementById('redPin');
+            pin.style.left = x + '%';
+            pin.style.top = y + '%';
+        }
+        var totalCount = 0;
+        function saveToQueue() {
+            var zone = document.getElementById('zoneSelect').value;
+            var detail = document.getElementById('detailInput').value;
+            var imgData = document.getElementById('previewImg').src;
+            if (!zone || !detail || document.getElementById('previewBox').style.display === 'none') {
+                alert('❌ กรุณาเลือกโซน กรอกรายละเอียด และเลือกรูปภาพให้ครบก่อนครับ');
+                return;
+            }
+            totalCount++;
+            document.getElementById('counter').innerText = totalCount;
+            document.getElementById('btnSubmitAPI').style.display = 'block';
+            var emptyText = document.getElementById('emptyText');
+            if (emptyText) emptyText.remove();
+            
+            var itemHtml = '<div class="defect-item"><div style="display: flex; align-items: center; gap: 12px;"><img src="' + imgData + '" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px;"><div><div style="font-size: 14px; font-weight: bold; color: #1f2937;">' + zone + '</div><div style="font-size: 12px; color: #4b5563;">' + detail + '</div><div style="font-size: 10px; color: #9ca3af;">หมุดจุดคลาดเคลื่อน: X:' + currentX + '% Y:' + currentY + '%</div></div></div></div>';
+            document.getElementById('listArea').insertAdjacentHTML('beforeend', itemHtml);
+            resetForm();
+        }
+        function resetForm() {
+            document.getElementById('zoneSelect').value = '';
+            document.getElementById('detailInput').value = '';
+            document.getElementById('photoFile').value = '';
+            document.getElementById('previewBox').style.display = 'none';
+        }
+        function postToCSharp() {
+            alert('🚀 ยิงข้อมูลนำส่งเข้าสู่ระบบเซิร์ฟเวอร์ C# Web API สำเร็จแล้ว!');
+            triggerLogout();
+            totalCount = 0;
+        }
+    </script>

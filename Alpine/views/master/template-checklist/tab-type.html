@@ -1,0 +1,76 @@
+  <!-- เนื้อหาแท็บประเภทคำตอบ -->
+      <div id="tab-content-type">
+
+            <div
+                class="flex-row-header flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 mb-4">
+                <div class="flex items-center space-x-2 text-amber-500 font-bold text-lg"
+                    style="color: #f59e0b; font-weight: bold; font-size: 1.125rem;">
+                    <i class="fa-solid fa-pencil text-sm"></i> &nbsp;<span>แบบคำตอบ</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3" style="display: flex; gap: 12px; align-items: center;">
+                    <select class="border border-gray-300 rounded px-3 py-1.5 text-sm bg-white focus:outline-none"
+                        style="border: 1px solid #d1d5db; padding: 6px 12px; border-radius: 4px; font-size: 14px; background: white;">
+                        <option>เลือกคอลัมน์ที่จะแสดง</option>
+                    </select>
+                    <input type="text" x-model="searchQuery" placeholder="ค้นหาข้อมูล แบบคำตอบ..."
+                        class="search-box border border-gray-300 rounded px-3 py-1.5 text-sm w-64 focus:outline-none">
+                    <button @click="alert('เปิดฟอร์มสร้าง')"
+                        class="btn-green bg-emerald-500 hover:bg-emerald-600 text-white font-medium text-sm px-4 py-1.5 rounded flex items-center space-x-1 shadow-sm transition cursor-pointer">
+                        <i class="fa-solid fa-plus text-xs"></i> <span>สร้างประเภทคำตอบ</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ตารางข้อมูล -->
+            <div class="table-responsive overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 font-semibold border-b border-gray-200">
+                            <th class="p-3" style="width: 100px;">code</th>
+                            <th class="p-3">ประเภทคำตอบ</th>
+                            <th class="p-3" style="width: 150px;">รูปแบบการกรอก</th>
+                            <th class="p-3" style="width: 180px;">ตัวเลือก/เกณฑ์ช่วงค่า</th>
+                            <th class="p-3" style="width: 120px; text-align: center;">สถานะ</th>
+                            <th class="p-3" style="width: 100px; text-align: center;">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(item, index) in filteredAnswers" :key="item.code">
+                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                                <td class="p-3 font-medium text-gray-900" style="font-weight: 600;" x-text="item.code">
+                                </td>
+                                <td class="p-3 text-red-600 font-medium" style="color: #dc2626; font-weight: 500;"
+                                    x-text="item.name"></td>
+                                <td class="p-3">
+                                    <span class="flex items-center space-x-2 text-gray-600"
+                                        style="display: flex; gap: 8px; align-items: center;">
+                                        <i :class="'fa-solid ' + item.icon" style="color: #9ca3af;"></i>
+                                        <span x-text="item.type"></span>
+                                    </span>
+                                </td>
+                                <td class="p-3 text-gray-500" x-text="item.options"></td>
+                                <td class="p-3 text-center" style="text-align: center;">
+                                    <button @click="item.active = !item.active"
+                                        :class="item.active ? 'status-active bg-emerald-50 text-emerald-700 border-emerald-200' : 'status-inactive bg-red-50 text-red-600 border-red-100'"
+                                        class="status-badge px-3 py-1 rounded-full text-xs font-semibold shadow-xs transition cursor-pointer">
+                                        <span x-text="item.active ? 'ใช้งาน' : 'ไม่ใช้งาน'"></span>
+                                    </button>
+                                </td>
+                                <td class="p-3 text-center" style="text-align: center;">
+                                    <button @click="alert('แก้ไขข้อมูลโค้ด: ' + item.code)"
+                                        class="text-teal-600 hover:text-teal-800 transition p-1 cursor-pointer"
+                                        style="color: #0d9488; background: none; border: none; cursor: pointer;">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr x-show="filteredAnswers.length === 0">
+                            <td colspan="6" class="p-8 text-center text-gray-400 bg-gray-50"
+                                style="text-align: center; color: #9ca3af; padding: 30px;">ไม่พบข้อมูลที่ค้นหา</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+      </div>

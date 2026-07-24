@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบแอปพลิเคชันหลังงาน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 1. ดึงไฟล์สไตล์ระบบหลักและระบบ Tailwind มาฉีดวาดหน้าจอ (แก้ไขให้เป็นพาธถูกต้องแล้ว) -->
+
+
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body x-data="spaApp()" x-init="initApp()">
+
+    <!-- 🟢 ส่วนที่ 1: หน้ากากล็อกอิน (แสดงผลเมื่อยังไม่ได้เข้าระบบ) -->
+    <template x-if="!isLoggedIn">
+        <div class="min-h-screen w-full flex items-center justify-center bg-slate-100 p-4">
+
+            <!-- กล่องการ์ดสีขาวของเดิมที่คุณทำไว้ (เอามาวางข้างในนี้ได้เลย) -->
+            <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
+                <!-- [หน้าจอที่ 1: ส่วนทางเข้า LOGIN] -->
+                <!-- 🟢 นำโค้ดชุดนี้ไปวางทับภายในแท็ก <template x-if="!isLoggedIn"> -->
+
+                <!-- ส่วนหัวข้อโลโก้และชื่อระบบ -->
+                <div class="text-center mb-8">
+                    <div class="text-4xl mb-3">🏢</div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">ระบบตรวจคอนโด</h2>
+                    <p class="text-sm text-slate-500 mt-1 font-medium">โหมดออนไลน์หน้าไซต์งาน สเปกเบาเครื่องช่าง</p>
+                </div>
+
+                <!-- ฟอร์มกรอกข้อมูลการเข้าสู่ระบบ -->
+                <div class="space-y-5">
+                    <div>
+                        <label
+                            class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">ชื่อผู้ใช้งาน
+                            (Username)</label>
+                        <div class="relative">
+                            <input type="text" x-model="username"
+                                class="w-full pl-4 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition duration-150"
+                                placeholder="ระบุชื่อผู้ใช้งาน">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">รหัสผ่าน
+                            (Password)</label>
+                        <input type="password" x-model="password"
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 placeholder-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none transition duration-150"
+                            placeholder="••••••••">
+                    </div>
+
+                    <!-- ปุ่มกดเข้าสู่ระบบ -->
+                    <button @click="handleLogin()" :disabled="isSubmitting"
+                        class="w-full mt-2 p-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 active:scale-[0.98] transition duration-150 shadow-lg shadow-blue-500/20 disabled:bg-slate-300 disabled:shadow-none flex justify-center items-center gap-2">
+                        <span>🔐</span>
+                        <span x-show="!isSubmitting">เข้าสู่ระบบ</span>
+                        <span x-show="isSubmitting">กำลังประมวลผล...</span>
+                    </button>
+                </div>
+
+                <!-- กล่องคำแนะนำผู้ใช้งานจำลองด้านล่าง -->
+                <div
+                    class="mt-8 pt-6 border-t border-slate-100 bg-amber-50/60 p-4 rounded-xl border border-amber-100/50">
+                    <div class="flex gap-2">
+                        <span class="text-base">💡</span>
+                        <div class="text-xs text-amber-800 leading-relaxed">
+                            <span class="font-bold block mb-0.5">ทดสอบเข้าใช้งานจริง</span>
+                            พิมพ์ชื่อผู้ใช้: <code
+                                class="bg-amber-100 px-1.5 py-0.5 rounded font-mono font-bold text-amber-900">admin</code>
+                            | รหัสผ่าน: <code
+                                class="bg-amber-100 px-1.5 py-0.5 rounded font-mono font-bold text-amber-900">1234</code>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </template>
+
+
+    <!-- 🟢 ส่วนที่ 2: ระบบจัดการหลังบ้านหลัก (แสดงผลเมื่อผ่านการตรวจสอบล็อกอินสำเร็จ) -->
+    <template x-if="isLoggedIn">
+        <div class="flex h-screen w-screen overflow-hidden bg-slate-50">
+ 
+            <!-- ปรับความกว้างอัตโนมัติ w-64 หรือ w-20 และใส่ความลื่นไหลด้วย transition-all -->
+            <div :class="isMenuOpen ? 'w-64' : 'w-20'"
+                class="bg-slate-900 text-white flex flex-col justify-between p-4 flex-shrink-0 transition-all duration-300 ease-in-out">
+                <div>
+                    <!-- ส่วนหัว: เพิ่มปุ่มกดสลับเปิด/ปิดเมนู และซ่อนตัวหนังสือเมื่อเมนูหด -->
+                    <div class="flex items-center justify-between p-3 mb-6 border-b border-slate-800">
+                        <div x-show="isMenuOpen" x-transition.opacity
+                            class="text-xl font-bold text-blue-400 whitespace-nowrap">
+                            CONDO SYSTEM
+                        </div>
+                        <!-- ปุ่มกดพับเมนู (ถ้าเมนูหดอยู่จะแสดง ◀ ถ้าเปิดอยู่จะแสดง ▶ หรือเปลี่ยนเป็นไอคอน Hamburger ได้) -->
+                        <button @click="isMenuOpen = !isMenuOpen"
+                            class="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition">
+                            <span x-text="isMenuOpen ? '◀' : '▶'"></span>
+                        </button>
+                    </div>
+
+                    <!-- พื้นที่จัดแสดงปุ่มกดรายการเมนูหลักและเมนูย่อยแบบโครงสร้าง Recursive -->
+                    <nav class="space-y-1.5 text-sm">
+                        <template x-for="menu in $store.mainApp.menus" :key="menu.id">
+                            <div class="space-y-1">
+
+                                <!-- เคสที่ A: เมนูเดี่ยวธรรมดา (ไม่มีเมนูย่อยซ้อนชั้น) -->
+                                <template x-if="!menu.children">
+                                    <button @click="activeTab = menu.id; loadPage(menu.path)"
+                                        class="w-full flex items-center px-1 py-3 rounded-xl text-left transition duration-150 text-slate-300 hover:bg-slate-800"
+                                        :class="activeTab === menu.id ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/20' : ''"
+                                        :title="menu.title"> <!-- ใส่ title เพื่อให้เมาส์ชี้แล้วขึ้นชื่อเมนูตอนหด -->
+                                        <span class="text-base flex-shrink-0" :class="isMenuOpen ? 'mr-3' : 'mx-auto'"
+                                            x-text="menu.icon"></span>
+                                        <span x-show="isMenuOpen" x-transition.opacity class="truncate"
+                                            x-text="menu.title"></span>
+                                    </button>
+                                </template>
+
+                                <!-- เคสที่ B: เมนูกลุ่มใหญ่ (มี submenus แฝงตัวอยู่ด้านใน) -->
+                                <template x-if="menu.children">
+                                    <!-- ฝังเงื่อนไข: หากเมนูพับอยู่ ให้ปิดเมนูย่อยอัตโนมัติเพื่อความสวยงาม -->
+                                    <div x-data="{ open: false }" x-effect="if(!isMenuOpen) open = false"
+                                        class="space-y-1">
+                                        <!-- หากเมนูหดอยู่ เมื่อคลิกที่กลุ่มเมนู จะเป็นการสั่งกางเมนูใหญ่ออกก่อน -->
+                                        <button @click="isMenuOpen ? open = !open : isMenuOpen = true"
+                                            class="w-full flex items-center justify-between px-1 py-3 rounded-xl text-left transition duration-150 text-slate-400 hover:bg-slate-800 hover:text-white"
+                                            :title="menu.title">
+                                            <div class="flex items-center min-w-0"
+                                                :class="!isMenuOpen ? 'w-full justify-center' : ''">
+                                                <span class="text-base flex-shrink-0" :class="isMenuOpen ? 'mr-3' : ''"
+                                                    x-text="menu.icon"></span>
+                                                <span x-show="isMenuOpen" x-transition.opacity
+                                                    class="truncate font-medium" x-text="menu.title"></span>
+                                            </div>
+                                            <span x-show="isMenuOpen" x-transition.opacity
+                                                class="text-[10px] text-slate-500 transition-transform duration-200 ml-2"
+                                                :class="open ? 'rotate-180 text-white' : ''"
+                                                >▼</span>
+                                        </button>
+
+                                        <!-- กล่องซ้อนชั้นแสดงปุ่มเมนูย่อย จะทำงานเมื่อกางออกเท่านั้น -->
+                                         <!-- บล็อกเมนูย่อย -->
+                                    <div x-show="open && isMenuOpen" x-transition class="pl-3 pr-2 space-y-1 border-l border-slate-800 ml-5">
+                                        <template x-for="sub in menu.children" :key="sub.id">
+                                            <button @click="activeTab = sub.id; loadPage(sub.path)" 
+                                                    class="w-full px-2 py-2.5 text-xs rounded-lg text-left transition duration-100 text-slate-400 hover:text-white hover:bg-slate-800/50"
+                                                    :class="activeTab === sub.id ? 'bg-slate-800 text-blue-400 font-bold' : ''">
+                                                
+                                                <span class="truncate" x-text="sub.title"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </template>
+                    </nav>
+                </div>
+
+                <!-- 📌 ปุ่มกดออกจากระบบส่วนกลาง -->
+                <div class="p-2 border-t border-slate-800 mt-auto">
+                    <button @click="handleLogout()"
+                        class="w-full flex items-center justify-center p-3 bg-rose-600 text-white font-semibold text-sm rounded-xl hover:bg-rose-700 active:scale-[0.98] transition duration-150 shadow-lg shadow-rose-600/10"
+                        :class="isMenuOpen ? 'gap-2.5' : 'gap-0'" title="ออกจากระบบ">
+                        <span class="text-base flex-shrink-0">🚪</span>
+                        <span x-show="isMenuOpen" x-transition.opacity class="whitespace-nowrap">ออกจากระบบ</span>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- 📌 แผงฝั่งขวา: กล่องพ่นเนื้อหาหน้าจอหลักขยายแผ่เต็มกว้าง 100% ตามขอบเขตหน้าจอ -->
+             <main id="main-content-layout" class="flex-1 p-6 overflow-y-auto h-full"> 
+                <!-- ไฟล์หน้าย่อยอื่นๆ เช่น dashboard.html จะถูกนำมาพ่นเปลี่ยนเฉพาะในโซนนี้อย่างสวยงาม -->
+             </main>
+
+        </div>
+    </template>
+
+    <!-- 💡 ป้ายเด้งเตือนเมื่อมีแจ้งเตือนสัญญานพุช (Global Toast Notification) แสดงได้จากทุกหน้า -->
+    <div x-show="toast.show" x-transition
+        class="fixed bottom-5 right-5 bg-slate-900 text-white p-4 rounded-xl shadow-2xl border border-slate-700 max-w-sm z-50 flex items-start gap-3">
+        <div class="text-xl">🔔</div>
+        <div>
+            <h4 class="font-bold text-sm text-blue-400" x-text="toast.title"></h4>
+            <p class="text-xs text-slate-300 mt-1" x-text="toast.body"></p>
+        </div>
+    </div>
+
+
+    <!-- 2. ดึงไฟล์ Logic และคลัง Service (แก้ไขพาธตรงไปที่โฟลเดอร์ด้านนอกตามโครงสร้างจริงของคุณ) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="/app.js"></script>
+    <script src="/modules/system/services/system.service.js"></script>
+</body>
+
+
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condo Inspection - Unit & Room Management</title>
+    <!-- ดีไซน์สไตล์ CSS โมเดิร์น คลีนตา ไร้ขอบซ้อน รองรับโหมด Offline 100% -->
+    <style>
+        body {
+            margin: 0;
+            padding: 10px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: transparent; /* โปร่งใสเพื่อให้กลืนกับหน้าแดชบอร์ดหลัก */
+            color: #1f2937;
+        }
+        html { overflow-x: hidden; }
+
+        /* ส่วนหัวและสถิติภาพรวมย่อย */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .title { font-size: 20px; font-weight: bold; margin: 0; color: #111827; }
+        .subtitle { font-size: 13px; color: #6b7280; margin: 4px 0 0 0; }
+
+        /* กล่องคอนเทนเนอร์หลัก */
+        .main-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+
+        /* แผงควบคุมการค้นหาและอัปโหลด Excel */
+        .control-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 14px;
+            width: 250px;
+            outline: none;
+        }
+        .search-box:focus { border-color: #2563eb; }
+
+        /* ปุ่มสไตล์โมเดิร์น */
+        .btn {
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-excel { background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .btn-excel:hover { background-color: #d1fae5; }
+        .btn-blue { background-color: #2563eb; color: white; }
+        .btn-blue:hover { background-color: #1d4ed8; }
+
+        /* สไตล์ตารางรายชื่อยูนิตห้อง */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #f9fafb; padding: 12px 20px; font-size: 11px; font-weight: 600; color: #4b5563; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 16px 20px; font-size: 14px; color: #111827; border-bottom: 1px solid #e5e7eb; }
+        tr:hover { background-color: #f9fafb; }
+
+        /* ป้ายบอกสถานะการตรวจห้อง */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; }
+        .badge-gray { background-color: #f3f4f6; color: #6b7280; } /* รอเดินตรวจ */
+        .badge-red { background-color: #fde8e8; color: #e11d48; }  /* มีจุดรอแก้ไข */
+        .badge-green { background-color: #dcfce7; color: #16a34a; } /* ตรวจผ่านพร้อมโอน */
+
+        .text-link { color: #2563eb; text-decoration: none; font-weight: 600; cursor: pointer; }
+        .text-link:hover { text-decoration: underline; }
+    </style>
+
+    <!-- ลอจิกควบคุมการจำลองเลือกไฟล์ Excel และกดดูรายละเอียดห้อง (Offline JS) -->
+    <script>
+        // 1. ฟังก์ชันดักจับเมื่อช่างเลือกไฟล์ Excel ข้อมูลห้องเข้ามาระบบ
+        function triggerExcelUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                alert('📊 ตรวจพบไฟล์: ' + file.name + '\nระบบเตรียมนำส่งไฟล์ไปที่ C# Web API เพื่อรัน Bulk Upload สร้างห้องจำนวน 150 ยูนิตลงฐานข้อมูลให้ทันทีครับ!');
+                
+                // จำลองสถานะอัปเดตห้องสำเร็จ
+                document.getElementById('totalRoomsText').innerText = '150 ห้อง';
+                document.getElementById('emptyRowText').style.display = 'none';
+                document.getElementById('roomsTableBody').style.display = 'table-row-group';
+            }
+        }
+
+        // 2. ฟังก์ชันสมมติเวลากดปุ่มดูรายละเอียดประวัติ defect รายห้อง
+        function viewRoomDetail(roomNum) {
+            alert('🔍 เปิดดูประวัติ และเล่มรายงาน Defect ของยูนิตห้อง: ' + roomNum);
+            // อนาคตสามารถสั่งเปลี่ยนหน้าย่อยเปิดเล่มรีพอร์ตของห้องนั้นๆ ได้เลยครับ
+        }
+    </script>
+</head>
+<body>
+
+    <!-- หัวข้อของฟังก์ชันย่อย -->
+    <div class="page-header">
+        <div>
+            <h1 class="title">🏗️ นำเข้าและจัดการยูนิตห้อง (Unit & Room Management)</h1>
+            <p class="subtitle">บริหารจัดการจำนวนห้องคอนโด นำเข้าผังตึกผ่าน Excel และตรวจสอบสถานะภาพรวมรายห้อง</p>
+        </div>
+    </div>
+
+    <!-- บล็อกการ์ดหลัก -->
+    <div class="main-card">
+        
+        <!-- แถบเครื่องมือควบคุมการใช้งาน -->
+        <div class="control-bar">
+            <!-- ค้นหาเลขห้อง -->
+            <input type="text" class="search-box" placeholder="🔍 พิมพ์ค้นหาเลขห้อง... เช่น 701">
+
+            <div style="display: flex; gap: 10px;">
+                <!-- ปุ่มกดอัปโหลดตาราง Excel ซ่อนกล่อง input แท้ไว้ -->
+                <input type="file" id="excelDataInput" accept=".xlsx, .xls, .csv" style="display: none;" onchange="triggerExcelUpload(event)">
+                <button onclick="document.getElementById('excelDataInput').click()" class="btn btn-excel">
+                    📥 Import Excel (Bulk Upload)
+                </button>
+                
+                <button onclick="alert('ฟังก์ชันเพิ่มห้องเดี่ยวรายยูนิต')" class="btn btn-blue">
+                    ＋ เพิ่มทีละห้อง
+                </button>
+            </div>
+        </div>
+
+        <!-- รายละเอียดจำนวนสรุปตัวเลขสถิติของตึกนี้ -->
+        <div style="display: flex; gap: 40px; margin-bottom: 20px; font-size: 13px; color: #4b5563; background: #f9fafb; padding: 12px 20px; border-radius: 10px; border: 1px solid #e5e7eb;">
+            <div>โครงการ: <span style="font-weight: bold; color: #111827;">คอนโด แฟลตดี รังสิต (ตึก A)</span></div>
+            <div>ยูนิตทั้งหมด: <span id="totalRoomsText" style="font-weight: bold; color: #2563eb;">4 ห้อง</span> (ทดสอบตัวอย่าง)</div>
+        </div>
+
+        <!-- ส่วนของตารางรายชื่อยูนิตห้องคอนโด -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>อาคาร/ตึก</th>
+                        <th>ชั้น</th>
+                        <th>เลขห้อง</th>
+                        <th>รูปแบบห้อง (Type)</th>
+                        <th>รายชื่อโซนภายในห้อง</th>
+                        <th>สถานะการตรวจงาน</th>
+                        <th>การจัดการ</th>
+                    </tr>
+                </thead>
+                
+                <!-- โครงเนื้อหาตารางรายชื่อห้อง -->
+                <tbody id="roomsTableBody">
+                    <tr>
+                        <td>ตึก A</td>
+                        <td>7</td>
+                        <td><span class="text-link" onclick="viewRoomDetail('701')">701</span></td>
+                        <td>1 Bedroom</td>
+                        <td style="font-size: 12px; color: #4b5563;">ห้องนอน, ห้องน้ำ, ระเบียง, นั่งเล่น</td>
+                        <td><span class="badge badge-red">รอช่างแก้ไข (2 จุด)</span></td>
+                        <td><span class="text-link" onclick="viewRoomDetail('701')">ดูรายละเอียด</span></td>
+                    </tr>
+                    <tr>
+                        <td>ตึก A</td>
+                        <td>7</td>
+                        <td><span class="text-link" onclick="viewRoomDetail('702')">702</span></td>
+                        <td>1 Bedroom</td>
+                        <td style="font-size: 12px; color: #4b5563;">ห้องนอน, ห้องน้ำ, ระเบียง, นั่งเล่น</td>
+                        <td><span class="badge badge-green">ผ่าน 100% พร้อมโอน</span></td>
+                        <td><span class="text-link" onclick="viewRoomDetail('702')">ดูรายละเอียด</span></td>
+                    </tr>
+                    <tr>
+                        <td>ตึก A</td>
+                        <td>7</td>
+                        <td><span class="text-link" onclick="viewRoomDetail('703')">703</span></td>
+                        <td>Studio</td>
+                        <td style="font-size: 12px; color: #4b5563;">ห้องนอน, ห้องน้ำ, ระเบียง</td>
+                        <td><span class="badge badge-gray">รอช่างเดินตรวจ</span></td>
+                        <td><span class="text-link" onclick="viewRoomDetail('703')">ดูรายละเอียด</span></td>
+                    </tr>
+                    <tr>
+                        <td>ตึก A</td>
+                        <td>8</td>
+                        <td><span class="text-link" onclick="viewRoomDetail('801')">801</span></td>
+                        <td>2 Bedroom</td>
+                        <td style="font-size: 12px; color: #4b5563;">ห้องนอน1, ห้องนอน2, ห้องน้ำ, ครัว, ระเบียง</td>
+                        <td><span class="badge badge-red">รอช่างแก้ไข (5 จุด)</span></td>
+                        <td><span class="text-link" onclick="viewRoomDetail('801')">ดูรายละเอียด</span></td>
+                    </tr>
+                </tbody>
+
+                <!-- ข้อความแจ้งเตือนเมื่อยังไม่นำเข้าข้อมูลโครงการ -->
+                <tbody id="emptyRowText" style="display: none;">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #9ca3af; padding: 40px 0;">
+                            ⚠️ ยังไม่มีข้อมูลยูนิตห้องคอนโดในตึกนี้ กรุณากดปุ่ม <b>Import Excel (Bulk Upload)</b> ด้านบนเพื่อสร้างข้อมูลห้องพร้อมกันทั้งตึก
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+  <!-- ========================================== -->
+            <!-- เนื้อหาแท็บ หมวดหมู่คำถาม (group) -->
+            <!-- ========================================== -->
+              <div id="tab-content-group">
+
+                <!-- ส่วนหัวของแท็บ group -->
+                <div class="flex-row-header"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                    <div
+                        style="color: #f59e0b; font-weight: bold; font-size: 1.125rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-folder-open"></i> <span>หมวดหมู่คำถาม</span>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="text" placeholder="ค้นหาหมวดหมู่คำถาม..." class="search-box"
+                            style="border: 1px solid #d1d5db; padding: 6px 12px; border-radius: 4px; font-size: 14px; width: 240px;">
+                        <button @click="alert('เปิดฟอร์มสร้างหมวดหมู่ใหม่')" class="btn-green"
+                            style="background-color: #f59e0b; color: white; padding: 6px 16px; border-radius: 4px; border: none; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-plus text-xs"></i> <span>สร้างหมวดหมู่</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ตารางแสดงกลุ่มหมวดหมู่คำถามและการผูกแบบคำตอบ -->
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">รหัสหมวดหมู่</th>
+                                <th>ชื่อหมวดหมู่คำถาม</th>
+                                <th>แบบคำตอบที่ถูกผูกไว้ (ตัวเลือก)</th>
+                                <th style="width: 150px; text-align: center;">จำนวนคำถาม</th>
+                                <th style="width: 100px; text-align: center;">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- ตัวอย่างแถวข้อมูลที่ 1 -->
+                            <tr>
+                                <td style="font-weight: 600;">GRP-01</td>
+                                <td style="color: #0d9488; font-weight: 500;">ระบบป้องกันอัคคีภัย (Fire Protection)</td>
+                                <td><span
+                                        style="background: #f3f4f6; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ชุดมาตรฐาน
+                                        ผ่าน / ไม่ผ่าน (Yes / No)</span></td>
+                                <td style="text-align: center; font-weight: 600;">5 ข้อ</td>
+                                <td style="text-align: center;">
+                                    <button class="text-teal-600"
+                                        style="color: #0d9488; background: none; border: none; cursor: pointer;"><i
+                                            class="fa-solid fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            <!-- ตัวอย่างแถวข้อมูลที่ 2 -->
+                            <tr>
+                                <td style="font-weight: 600;">GRP-02</td>
+                                <td style="color: #0d9488; font-weight: 500;">งานตรวจเช็คความสะอาด (Housekeeping)</td>
+                                <td><span
+                                        style="background: #f3f4f6; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ชุดประเมินงานแม่บ้าน
+                                        5 ระดับ</span></td>
+                                <td style="text-align: center; font-weight: 600;">12 ข้อ</td>
+                                <td style="text-align: center;">
+                                    <button class="text-teal-600"
+                                        style="color: #0d9488; background: none; border: none; cursor: pointer;"><i
+                                            class="fa-solid fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>

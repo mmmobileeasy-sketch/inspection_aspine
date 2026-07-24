@@ -1,0 +1,56 @@
+ <!-- เปิดหน้าด้วยเนื้อหาหลักทันที ตั้งค่า ID เพื่อให้ปุ่มเมนูบาร์รู้ตำแหน่งและสับเปลี่ยนสีได้ถูกต้อง -->
+<div id="dashboard" class="space-y-6">
+    
+    <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">🏢 แผงภาพรวมระบบประจำโครงการ</h1>
+            <p class="text-slate-500 text-sm mt-1">ยินดีต้อนรับกลับมา, <span class="font-semibold text-slate-700" x-text="username"></span></p>
+        </div>
+    </div>
+
+    <!-- แผงประวัติแจ้งเตือนจาก Firebase FCM (ดึงข้อมูลมาจากกล่อง notifications ส่วนกลางมาโชว์เรียลไทม์) -->
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <span>⚠️</span> รายการล็อกแจ้งเตือน (Real-time FCM Log)
+        </h3>
+        
+        <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+            <!-- ทำการวนลูปดึงข้อมูลจากอาร์เรย์ของตึกใหญ่มาพ่นโชว์ดื้อๆ ได้ทันที -->
+            <template x-for="item in notifications" :key="item.id">
+                <div class="p-4 bg-slate-50 border border-slate-100 rounded-lg hover:bg-slate-100 transition duration-150">
+                    <div class="flex justify-between items-start">
+                        <strong class="text-slate-800 font-medium text-sm" x-text="item.title"></strong>
+                        <span class="text-xs text-slate-400 font-mono" x-text="item.time"></span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-1" x-text="item.body"></p>
+                </div>
+            </template>
+
+            <!-- แสดงผลเมื่อไม่มีรายการแจ้งเตือนค้างในตึก -->
+            <template x-if="notifications.length === 0">
+                <div class="text-center py-8 text-slate-400 italic text-sm">
+                    ไม่มีประวัติการแจ้งเตือนพุชเข้ามาในขณะนี้...
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // 📦 ถุงจำลองเก็บค่าฟังก์ชันคำนวณและดึงข้อมูลของหน้า Dashboard เท่านั้น
+    window.dashboardPage = {
+        init() {
+            console.log("⚡ หน้า Dashboard โหลดสำเร็จ: รันคำสั่งดึงยอดรวมสถิติตามรอบปกติ");
+        }
+    };
+    
+    // สั่งรันคำสั่งเริ่มต้นทำงานของหน้าตัวเอง
+    window.dashboardPage.init();
+
+    // 🧹 ทำความสะอาดถุงข้อมูลเมื่อผู้ใช้กระโดดหนีไปเปิดเมนูหน้าอื่น เพื่อสุขอนามัยของแรมเครื่องคอมพิวเตอร์
+    window.currentPageCleanup = function() {
+        console.log("🧹 ล้างคลังความจำเฉพาะของหน้า Dashboard ออกเรียบร้อย");
+        window.dashboardPage = null;
+    };
+</script>

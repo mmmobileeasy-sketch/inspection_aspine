@@ -1,0 +1,290 @@
+ 
+    <div class="container">
+        <!-- ส่วนหัวข้อ -->
+        <div class="header">
+            <div>
+                <h1 class="title">🏢 ตั้งค่าโปรไฟล์โครงการคอนโด</h1>
+                <p class="subtitle">สร้างหรือแก้ไขข้อมูลตึก พร้อมนำเข้าข้อมูลห้องลูกบ้านสำหรับเริ่มเดินตรวจ</p>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" class="btn btn-secondary"
+                style="padding: 8px 16px; font-size: 12px;">🔙 กลับแดชบอร์ด</button>
+        </div>
+
+        <!-- ฟอร์มข้อมูลหลัก -->
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="label">ชื่อโครงการคอนโด *</label>
+                <input type="text" id="projName" class="input-text" placeholder="เช่น คอนโด แฟลตดี รังสิต (ตึก A)">
+            </div>
+
+            <div class="form-group">
+                <label class="label">ชื่อบริษัทผู้พัฒนา (Developer Company) *</label>
+                <input type="text" id="compName" class="input-text"
+                    placeholder="เช่น บริษัท แฟลตดี พร็อพเพอร์ตี้ จำกัด">
+            </div>
+
+            <div class="form-group full-width">
+                <label class="label">ทำเลที่ตั้ง / ที่อยู่โครงการ *</label>
+                <input type="text" id="loc" class="input-text"
+                    placeholder="เช่น ถ.พหลโยธิน ต.คลองหนึ่ง อ.คลองหลวง ปทุมธานี">
+            </div>
+
+            <div class="form-group">
+                <label class="label">จำนวนยูนิตทั้งหมด (ห้อง)</label>
+                <input type="number" id="units" class="input-text" placeholder="เช่น 150" value="150">
+            </div>
+
+            <div class="form-group">
+                <label class="label">ประเภทอาคาร</label>
+                <select class="select-box">
+                    <option value="low-rise">Low-Rise (ไม่เกิน 8 ชั้น)</option>
+                    <option value="high-rise">High-Rise (อาคารสูง)</option>
+                </select>
+            </div>
+
+            <!-- อัปโหลดโลโก้บริษัท สำหรับประทับหัวรายงาน PDF -->
+            <div class="form-group">
+                <label class="label">โลโก้บริษัท (จะฝังอัตโนมัติบนหัวรายงาน PDF)</label>
+                <div class="upload-box" onclick="document.getElementById('logoInput').click()">
+                    <span style="font-size: 13px; color: #6b7280;">📁 คลิกเพื่อเลือกไฟล์โลโก้ (.PNG / .JPG)</span>
+                    <input type="file" id="logoInput" accept="image/*" class="hidden" style="display:none;"
+                        onchange="previewImage(event, 'logoPreview')">
+                    <br><img id="logoPreview" class="upload-preview">
+                </div>
+            </div>
+
+            <!-- อัปโหลดรูปภาพจำลองตึก เพื่อโชว์บนหน้าแดชบอร์ด -->
+            <div class="form-group">
+                <label class="label">ภาพหน้าปกโครงการ (Show on Dashboard)</label>
+                <div class="upload-box" onclick="document.getElementById('coverInput').click()">
+                    <span style="font-size: 13px; color: #6b7280;">📸 คลิกเพื่อเลือกรูปภาพหน้าปกตึก</span>
+                    <input type="file" id="coverInput" accept="image/*" class="hidden" style="display:none;"
+                        onchange="previewImage(event, 'coverPreview')">
+                    <br><img id="coverPreview" class="upload-preview">
+                </div>
+            </div>
+        </div>
+
+        <!-- โซนสำหรับ Bulk Upload รายชื่อห้องจากตาราง Excel -->
+        <div class="excel-section">
+            <h3 style="margin: 0 0 8px 0; font-size: 14px; color: #1e40af;">📊 นำเข้ายูนิตห้องคอนโดทั้งหมดผ่านไฟล์ Excel
+                (Bulk Upload)</h3>
+            <p style="margin: 0 0 16px 0; font-size: 12px; color: #1e3a8a; line-height: 1.5;">
+                เพื่อความรวดเร็ว ผู้จัดการโครงการสามารถอัปโหลดไฟล์ตาราง Excel ที่มีลิสต์เลขห้อง ชื่อโซน
+                และชื่อลูกบ้านตามโครงสร้างมาตรฐาน เข้าระบบเพื่อสร้างห้องรวดเดียวพร้อมตรวจทั้งตึกได้ทันที
+            </p>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <button onclick="document.getElementById('excelInput').click()" class="btn btn-secondary"
+                    style="background: white; border: 1px solid #cbd5e1; font-size: 13px; padding: 10px 20px;">
+                    📂 เลือกไฟล์ Excel (.xlsx)
+                </button>
+            </div>
+        </div>
+          <style> 
+
+        /* แก้ไขในแท็ก <style> ของไฟล์ project-setup.html */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: transparent;
+            /* เปลี่ยนจาก #ffffff เป็นโปร่งใส */
+            box-shadow: none;
+            /* ลบเงาที่ซ้อนกันออกทิ้ง */
+            padding: 10px 0px;
+            /* ปรับระยะห่างให้พอดี */
+            box-sizing: border-box;
+        }
+
+        /* เพิ่มส่วนการ์ดฟอร์มให้มีสีขาวแผ่นเดียวแบบคลีนๆ */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+            background: #ffffff;
+            /* ย้ายพื้นหลังสีขาวมาไว้ที่ตัวฟอร์ม */
+            padding: 24px;
+            border-radius: 20px;
+            /* โค้งมนรอบฟอร์มทีเดียว */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 16px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #111827;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* การจัดกริดฟอร์มแบ่งซ้ายขวา */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .input-text,
+        .select-box {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+
+        .input-text:focus,
+        .select-box:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* สไตล์โซนอัปโหลดรูปภาพ/ไฟล์ */
+        .upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: #f9fafb;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-box:hover {
+            border-color: #2563eb;
+            background: #f0f5ff;
+        }
+
+        .upload-preview {
+            max-height: 120px;
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* โซนนำเข้าไฟล์ Excel */
+        .excel-section {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 28px;
+        }
+
+        /* แถบปุ่มกดยืนยันด้านล่าง */
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-blue {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-blue:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+
+    <!-- ลอจิกจำลองการทำงานดึงรูปพรีวิว และเตรียมแพ็กข้อมูลยิงไป C# API -->
+    <script>
+        // 1. ฟังก์ชันพรีวิวภาพจำลองโครงการหรือโลโก้บริษัท
+        function previewImage(event, previewId) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const imgEl = document.getElementById(previewId);
+                imgEl.src = e.target.result;
+                imgEl.style.display = 'inline-block';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // 2. ฟังก์ชันจับตาดูไฟล์ Excel ยูนิตห้องคอนโดที่ช่างเลือกเข้ามา
+        var excelFileGeom = null;
+        function handleExcelFile(event) {
+            excelFileGeom = event.target.files[0];
+            if (excelFileGeom) {
+                document.getElementById('excelStatus').innerText = '📄 พร้อมอัปโหลดไฟล์: ' + excelFileGeom.name;
+                document.getElementById('excelStatus').style.color = '#16a34a';
+            }
+        }
+
+        // 3. ฟังก์ชันรวบรวมฟิลด์ทั้งหมดเพื่อเตรียมโพสต์ยิงเข้า C# Web API
+        function saveProjectProfile() {
+            const projectName = document.getElementById('projName').value;
+            const companyName = document.getElementById('compName').value;
+            const location = document.getElementById('loc').value;
+            const totalUnits = document.getElementById('units').value;
+
+            if (!projectName || !companyName || !location) {
+                alert('❌ กรุณากรอกข้อมูลพื้นฐานโครงการให้ครบถ้วนก่อนบันทึกครับ');
+                return;
+            }
+
+            // ในโปรเจกต์จริง จุดนี้พี่จะใช้คำสั่ง FormData ยิงอัปโหลดทั้ง Text และไฟล์รูป/Excel ไปที่ C# API ทีเดียวครับ
+            alert('🎉 บันทึกโปรไฟล์โครงการสำเร็จ!\nข้อมูลระบบส่งไปเซิร์ฟเวอร์เรียบร้อยแล้ว\n(พร้อมจัดคิวส่งต่อรายชื่อห้องเข้าสู่คลังฐานข้อมูลใหม่)');
+
+            // สั่ง Redirect เด้งกลับไปหน้าแดชบอร์ดหลักหลังบันทึกเสร็จ
+            window.location.href = 'dashboard.html';
+        }
+    </script>

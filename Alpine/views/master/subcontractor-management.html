@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub-contractor Assignment</title>
+    <!-- ดีไซน์สไตล์ CSS คลีนตา ปุ่มใหญ่ กดสลับลอจิกได้แม่นยำแม้รันโหมด Offline -->
+    <style>
+        body {
+            margin: 0;
+            padding: 10px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: transparent;
+            color: #1f2937;
+        }
+        html { overflow-x: hidden; }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .title { font-size: 20px; font-weight: bold; margin: 0; color: #111827; }
+        .subtitle { font-size: 13px; color: #6b7280; margin: 4px 0 0 0; }
+
+        /* การ์ดสถิติแบ่งตามรายทีมผู้รับเหมา */
+        .contractor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .contractor-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+        .team-name { font-size: 14px; font-weight: bold; color: #1f2937; margin-bottom: 8px; }
+        .task-counter { font-size: 12px; color: #4b5563; }
+        .count-num { font-size: 18px; font-weight: bold; color: #2563eb; }
+
+        .main-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        /* ตารางจ่ายงาน */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #f9fafb; padding: 12px 16px; font-size: 11px; font-weight: 600; color: #4b5563; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 14px 16px; font-size: 14px; color: #111827; border-bottom: 1px solid #e5e7eb; }
+        tr:hover { background-color: #f9fafb; }
+
+        /* ตัวเลือก Select สไตล์แอปพรีเมียม */
+        .select-assign {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            background: white;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+            max-width: 180px;
+        }
+        .select-assign:focus { border-color: #2563eb; }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; }
+        .badge-amber { background-color: #fef3c7; color: #d97706; }
+        .badge-blue { background-color: #dbeafe; color: #2563eb; }
+
+        .btn-add { background-color: #2563eb; color: white; padding: 10px 16px; font-size: 13px; font-weight: bold; border-radius: 10px; border: none; cursor: pointer; }
+        .btn-add:hover { background-color: #1d4ed8; }
+    </style>
+
+    <script>
+        // ลอจิกแจ้งเตือนสถานะเมื่อทำการกดสลับจ่ายงานให้ผู้รับเหมาเจ้าอื่น
+        function updateAssignment(room, defect, selectElement) {
+            const selectedTeam = selectElement.value;
+            alert('🔄 จ่ายงานสำเร็จ!\nยูนิต: ' + room + '\nงาน: ' + defect + '\nย้ายส่งต่อมอบหมายให้ 👉 ' + selectedTeam);
+            // ตรงนี้อนุกรมคำสั่งจะส่ง fetch ยิงบันทึกรหัสทีมช่างใหม่กลับไปที่ C# Web API ของพี่ทันทีครับ
+        }
+    </script>
+</head>
+<body>
+
+    <div class="page-header">
+        <div>
+            <h1 class="title">👷 จ่ายงานและคุมผู้รับเหมาช่วง (Sub-contractor Assignment)</h1>
+            <p class="subtitle">แจกจ่ายรายการ Defect หน้างานจับคู่ให้ช่างแต่ละทีมรับผิดชอบ พร้อมตรวจสอบความคืบหน้า</p>
+        </div>
+        <button onclick="alert('ฟังก์ชันเพิ่มรายชื่อบริษัทผู้รับเหมาใหม่')" class="btn-add">＋ เพิ่มทีมผู้รับเหมา</button>
+    </div>
+
+    <!-- บล็อกสรุปสถิติจำนวนงานค้างในมือช่างแต่ละกลุ่ม -->
+    <div class="contractor-grid">
+        <div class="contractor-card" style="border-left: 4px solid #ef4444;">
+            <div class="team-name">⚡ ทีมระบบไฟฟ้า (ช่างบี)</div>
+            <div class="task-counter">งานค้างแก้: <span class="count-num">12</span> จุด</div>
+        </div>
+        <div class="contractor-card" style="border-left: 4px solid #f59e0b;">
+            <div class="team-name">🧱 ทีมงานสี/สถาปัตย์ (ช่างเอ)</div>
+            <div class="task-counter">งานค้างแก้: <span class="count-num">18</span> จุด</div>
+        </div>
+        <div class="contractor-card" style="border-left: 4px solid #3b82f6;">
+            <div class="team-name">🚰 ทีมระบบประปา (ช่างเจน)</div>
+            <div class="task-counter">งานค้างแก้: <span class="count-num">8</span> จุด</div>
+        </div>
+    </div>
+
+    <!-- ตารางคุมเนื้องานและกดสั่ง Assign จ่ายงาน -->
+    <div class="main-card">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>เลขห้อง</th>
+                        <th>บริเวณ / โซน</th>
+                        <th>รายการปัญหา (Defect)</th>
+                        <th>สถานะจุดตรวจ</th>
+                        <th>ทีมผู้รับเหมาที่รับผิดชอบ (คลิกเพื่อจ่ายงาน)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>ห้อง 701</b></td>
+                        <td>ห้องน้ำ</td>
+                        <td>กระเบื้องผนังร่อน 2 แผ่นปูนไม่เต็ม</td>
+                        <td><span class="badge badge-amber">รอดำเนินการ</span></td>
+                        <td>
+                            <!-- ผูกฟังก์ชันดักจับเปลี่ยนค่าบน Alpine/JS -->
+                            <select class="select-assign" onchange="updateAssignment('701', 'กระเบื้องร่อน', this)">
+                                <option value="ทีมงานสี/สถาปัตย์ (ช่างเอ)" selected>ทีมสี/สถาปัตย์ (ช่างเอ)</option>
+                                <option value="ทีมระบบไฟฟ้า (ช่างบี)">ทีมระบบไฟฟ้า (ช่างบี)</option>
+                                <option value="ทีมระบบประปา (ช่างเจน)">ทีมระบบประปา (ช่างเจน)</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>ห้อง 701</b></td>
+                        <td>ห้องนอน</td>
+                        <td>เต้ารับสายไฟไม่มีสัญญานไฟเข้า</td>
+                        <td><span class="badge badge-blue">กำลังแก้ไข</span></td>
+                        <td>
+                            <select class="select-assign" onchange="updateAssignment('701', 'สายไฟไม่มีสัญญาณ', this)">
+                                <option value="ทีมงานสี/สถาปัตย์ (ช่างเอ)">ทีมสี/สถาปัตย์ (ช่างเอ)</option>
+                                <option value="ทีมระบบไฟฟ้า (ช่างบี)" selected>ทีมระบบไฟฟ้า (ช่างบี)</option>
+                                <option value="ทีมระบบประปา (ช่างเจน)">ทีมระบบประปา (ช่างเจน)</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>ห้อง 504</b></td>
+                        <td>ระเบียง</td>
+                        <td>ท่อระบายน้ำอุดตัน มีเศษทรายค้าง</td>
+                        <td><span class="badge badge-amber">รอดำเนินการ</span></td>
+                        <td>
+                            <select class="select-assign" onchange="updateAssignment('504', 'ท่อน้ำอุดตัน', this)">
+                                <option value="ทีมงานสี/สถาปัตย์ (ช่างเอ)">ทีมสี/สถาปัตย์ (ช่างเอ)</option>
+                                <option value="ทีมระบบไฟฟ้า (ช่างบี)">ทีมระบบไฟฟ้า (ช่างบี)</option>
+                                <option value="ทีมระบบประปา (ช่างเจน)" selected>ทีมระบบประปา (ช่างเจน)</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

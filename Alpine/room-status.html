@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Progress & Room Status</title>
+    <!-- ดีไซน์สไตล์ CSS โหมดผังห้องแบบ Grid สีสันบอกสถานะชัดเจน รันแบบ Offline 100% -->
+    <style>
+        body {
+            margin: 0;
+            padding: 10px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: transparent;
+            color: #1f2937;
+        }
+        html { overflow-x: hidden; }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .title { font-size: 20px; font-weight: bold; margin: 0; color: #111827; }
+        .subtitle { font-size: 13px; color: #6b7280; margin: 4px 0 0 0; }
+
+        /* แถบอธิบายความหมายของสีสถานะ (Legend) */
+        .legend-bar {
+            display: flex;
+            gap: 16px;
+            background: #ffffff;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            flex-wrap: wrap;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .color-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+        .main-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 24px;
+        }
+
+        /* แถบแสดงเปอร์เซ็นต์ความคืบหน้าของโครงการ (Progress Bar) */
+        .progress-section { margin-bottom: 24px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; margin-bottom: 8px; }
+        .progress-bg { width: 100%; background-color: #e5e7eb; height: 12px; border-radius: 6px; overflow: hidden; }
+        .progress-bar { background-color: #10b981; height: 100%; width: 75%; transition: width 0.5s ease-in-out; }
+
+        /* โครงสร้างชั้นคอนโด (Floor Rows) */
+        .floor-container { display: flex; flex-direction: column; gap: 16px; }
+        .floor-row { display: flex; align-items: center; border-bottom: 1px dashed #e5e7eb; padding-bottom: 12px; }
+        .floor-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .floor-label { width: 60px; font-size: 13px; font-weight: bold; color: #4b5563; flex-shrink: 0; }
+        
+        /* ตารางผังกล่องเลขห้อง (Room Grid) */
+        .room-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+        .room-box {
+            width: 70px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .room-box:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        
+        /* สีของกล่องห้องตามสถานะ */
+        .status-gray { background-color: #f3f4f6; color: #4b5563; } /* รอตรวจ */
+        .status-red { background-color: #fee2e2; color: #dc2626; }  /* ค้างแก้ */
+        .status-amber { background-color: #fef3c7; color: #d97706; } /* รอตรวจซ้ำ */
+        .status-green { background-color: #dcfce7; color: #16a34a; } /* ผ่าน/โอนได้ */
+
+        .defect-count { font-size: 9px; font-weight: 500; margin-top: 2px; opacity: 0.8; }
+    </style>
+
+    <script>
+        // ลอจิกจำลองเมื่อกดจิ้มดูสถานะความคืบหน้าแบบประวัติเจาะลึกรายห้อง
+        function showRoomStatusDetail(roomNumber, statusDesc, defects) {
+            alert('🔍 ยูนิตห้อง: ' + roomNumber + 
+                  '\nสถานะปัจจุบัน: ' + statusDesc + 
+                  '\nจำนวนเนื้องาน Defect: ' + defects + ' จุด' +
+                  '\n\n(ระบบจะดึงประวัติ Audit Trail และชื่อช่างที่รับผิดชอบจาก C# Web API มาแสดงผลเกื้อหนุนในกล่องป๊อปอัพต่อไปครับ)');
+        }
+    </script>
+</head>
+<body>
+
+    <div class="page-header">
+        <div>
+            <h1 class="title">📈 ความคืบหน้ารายยูนิต (Project Progress & Room Status)</h1>
+            <p class="subtitle">ตรวจสอบภาพรวมผังตึกคอนโดรายชั้น ติดตามห้องที่ตรวจผ่านฉลุยและห้องที่ติดปัญหาแก้งานล่าช้า</p>
+        </div>
+    </div>
+
+    <!-- แถบอธิบายโค้ดสีสถานะ -->
+    <div class="legend-bar">
+        <div class="legend-item"><div class="color-dot status-gray"></div><span>รอช่างเดินตรวจ (Gray)</span></div>
+        <div class="legend-item"><div class="color-dot status-red"></div><span>มีจุดรอช่างแก้ไข (Red)</span></div>
+        <div class="legend-item"><div class="color-dot status-amber"></div><span>ช่างแก้แล้ว รอตรวจซ้ำ (Amber)</span></div>
+        <div class="legend-item"><div class="color-dot status-green"></div><span>ตรวจผ่าน 100% พร้อมโอน (Green)</span></div>
+    </div>
+
+    <!-- บล็อกแสดงสถิติภาพรวมความคืบหน้าของโครงการ -->
+    <div class="main-card">
+        <div class="progress-section">
+            <div class="progress-label">
+                <span>ความคืบหน้าการปิดยอดตรวจรับตึกคอนโด</span>
+                <span style="color: #10b981;">75% (โอนได้แล้ว 9 จาก 12 ยูนิต)</span>
+            </div>
+            <div class="progress-bg">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- ผังรายชั้นและห้องคอนโดแบบ Visual Grid -->
+        <div class="floor-container">
+            
+            <!-- ชั้น 8 -->
+            <div class="floor-row">
+                <div class="floor-label">ชั้น 8</div>
+                <div class="room-grid">
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('801', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>801</span><span class="defect-count">Passed</span>
+                    </div>
+                    <div class="room-box status-red" onclick="showRoomStatusDetail('802', 'มีจุดรอกลุ่มช่างสีแก้ไข', 4)">
+                        <span>802</span><span class="defect-count">4 Defects</span>
+                    </div>
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('803', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>803</span><span class="defect-count">Passed</span>
+                    </div>
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('804', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>804</span><span class="defect-count">Passed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ชั้น 7 -->
+            <div class="floor-row">
+                <div class="floor-label">ชั้น 7</div>
+                <div class="room-grid">
+                    <div class="room-box status-amber" onclick="showRoomStatusDetail('701', 'ช่างซ่อมเสร็จแล้ว รอวิศวกรตรวจงานซ้ำ', 2)">
+                        <span>701</span><span class="defect-count">2 Re-check</span>
+                    </div>
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('702', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>702</span><span class="defect-count">Passed</span>
+                    </div>
+                    <div class="room-box status-red" onclick="showRoomStatusDetail('703', 'มีจุดรอกลุ่มช่างไฟแก้ไข', 1)">
+                        <span>703</span><span class="defect-count">1 Defect</span>
+                    </div>
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('704', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>704</span><span class="defect-count">Passed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ชั้น 6 -->
+            <div class="floor-row">
+                <div class="floor-label">ชั้น 6</div>
+                <div class="room-grid">
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('601', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>601</span><span class="defect-count">Passed</span>
+                    </div>
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('602', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>602</span><span class="defect-count">Passed</span>
+                    </div>
+                    <div class="room-box status-gray" onclick="showRoomStatusDetail('603', 'ห้องว่าง โครงสร้างสถาปัตย์เสร็จ รอเปิดระบบเดินตรวจรอบแรก', 0)">
+                        <span>603</span><span class="defect-count">No Data</span>
+                    </div>
+                    <div class="room-box status-green" onclick="showRoomStatusDetail('604', 'ผ่าน 100% พร้อมโอน', 0)">
+                        <span>604</span><span class="defect-count">Passed</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
