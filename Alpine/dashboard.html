@@ -1,56 +1,316 @@
- <!-- เปิดหน้าด้วยเนื้อหาหลักทันที ตั้งค่า ID เพื่อให้ปุ่มเมนูบาร์รู้ตำแหน่งและสับเปลี่ยนสีได้ถูกต้อง -->
+<!-- เปิดหน้าด้วยเนื้อหาหลักทันที ตั้งค่า ID เพื่อให้ปุ่มเมนูบาร์รู้ตำแหน่งและสับเปลี่ยนสีได้ถูกต้อง -->
 <div id="dashboard" class="space-y-6">
-    
+
     <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <div>
             <h1 class="text-2xl font-bold text-slate-800">🏢 แผงภาพรวมระบบประจำโครงการ</h1>
-            <p class="text-slate-500 text-sm mt-1">ยินดีต้อนรับกลับมา, <span class="font-semibold text-slate-700" x-text="username"></span></p>
+            <p class="text-slate-500 text-sm mt-1">ยินดีต้อนรับกลับมา, <span class="font-semibold text-slate-700"
+                    x-text="username"></span></p>
         </div>
     </div>
 
-    <!-- แผงประวัติแจ้งเตือนจาก Firebase FCM (ดึงข้อมูลมาจากกล่อง notifications ส่วนกลางมาโชว์เรียลไทม์) -->
-    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <span>⚠️</span> รายการล็อกแจ้งเตือน (Real-time FCM Log)
-        </h3>
-        
-        <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
-            <!-- ทำการวนลูปดึงข้อมูลจากอาร์เรย์ของตึกใหญ่มาพ่นโชว์ดื้อๆ ได้ทันที -->
-            <template x-for="item in notifications" :key="item.id">
-                <div class="p-4 bg-slate-50 border border-slate-100 rounded-lg hover:bg-slate-100 transition duration-150">
-                    <div class="flex justify-between items-start">
-                        <strong class="text-slate-800 font-medium text-sm" x-text="item.title"></strong>
-                        <span class="text-xs text-slate-400 font-mono" x-text="item.time"></span>
+
+
+    <div x-data="window.dashboardPage.dashboardFilter('a','b')">
+
+
+        <!-- คอนเทนเนอร์หลัก ครอบคลุมพื้นที่ขวาเต็มหน้าจอ -->
+        <!-- คอนเทนเนอร์หลักขวาเต็มหน้าจอ -->
+        <div      class="flex flex-row flex-wrap gap-4 mb-6 w-full"
+    style="flex-direction: row !important; flex-wrap: wrap !important;">
+
+            <!-- 📦 Card ใหญ่สีขาว (ครอบคลุมเนื้อหาทั้งหมด) -->
+            <div
+                style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); width: 100%; display: flex; flex-direction: column; gap: 24px;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- [1] ส่วนของปุ่มเลือกช่วงวันที่ (Date Filter) อยู่บนสุดข้างในการ์ดใหญ่ -->
+                <div style="background: #f9fafb; padding: 16px; border-radius: 12px; border: 1px solid #f3f4f6;">
+                    <label style="font-weight: 500; color: #4b5563;">เลือกช่วงวันที่ตรวจคอนโด (สูงสุด 1 เดือน):</label>
+                    <div style="display: flex; gap: 12px; margin-top: 8px; align-items: center;">
+
+
+
+
+
+
+                        <div x-data="{ dateStart: '2026-07-16', dateEnd: '2026-07-22' }" class="mb-4">
+                            <div x-init="
+            setTimeout(() => {
+                if (typeof DateRangePicker !== 'undefined') {
+                    // เปิดใช้งานปฏิทินช่วงวันที่ โดยระบุภาษาไทยสำเร็จรูปจาก Package ในเครื่อง
+                    new DateRangePicker($el, {
+                        language: 'th', // 🌟 ปลดล็อก Culture TH เดือนไทย/สัปดาห์ไทยครบทุกเครื่อง
+                        format: 'yyyy-mm-dd',
+                        autohide: true,
+                        orientation: 'bottom left'
+                    });
+                }
+            }, 100);
+
+            // ดักจับการเลือกวันที่เพื่อส่งค่ากลับเข้า Alpine.js
+            $el.querySelectorAll('input').forEach(input => {
+                input.addEventListener('changeDate', (e) => {
+                    if (e.target.name === 'start') dateStart = e.target.value;
+                    if (e.target.name === 'end') dateEnd = e.target.value;
+                });
+            });
+        " class="flex items-center space-x-2">
+                                <div class="relative w-44">
+                                    <div
+                                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-xs text-gray-400">
+                                        📅</div>
+                                    <input name="start" type="text" x-model="dateStart"
+                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-9 p-2 cursor-pointer">
+                                </div>
+                                <span class="text-gray-500 text-sm">to</span>
+                                <div class="relative w-44">
+                                    <div
+                                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-xs text-gray-400">
+                                        📅</div>
+                                    <input name="end" type="text" x-model="dateEnd"
+                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-9 p-2 cursor-pointer">
+                                </div>
+
+                                <button @click="window.dashboardPage.dashboardFilter(dateStart, dateEnd)"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center w-10 h-10 rounded-lg transition-colors ml-2 shadow-sm">
+                                    <!-- ไอคอนแว่นขยาย (Search Icon) ขนาดพอดีสวยงาม -->
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        xmlns="http://w3.org">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <style>
+                                .datepicker {
+                                    z-index: 99999 !important;
+                                }
+                            </style>
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     </div>
-                    <p class="text-xs text-slate-600 mt-1" x-text="item.body"></p>
-                </div>
-            </template>
 
-            <!-- แสดงผลเมื่อไม่มีรายการแจ้งเตือนค้างในตึก -->
-            <template x-if="notifications.length === 0">
-                <div class="text-center py-8 text-slate-400 italic text-sm">
-                    ไม่มีประวัติการแจ้งเตือนพุชเข้ามาในขณะนี้...
-                </div>
-            </template>
+                    <!-- [2] แผงตัวเลขสรุป 3 ใบ (Metrics Cards) แผ่เต็มหน้าจอภายใน -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
+
+
+                        <!-- 📊 กล่องที่ 1: จ็อบตรวจทั้งหมด -->
+                        <div
+                            class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <p class="text-[11px] font-medium text-gray-500">จ็อบตรวจทั้งหมด</p>
+                                <span class="text-[11px] font-bold text-gray-700">100%</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2" x-text="total">0</h3>
+
+                            <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                <div class="bg-gray-400 h-1.5 rounded-full" :style="`width: ${total > 0 ? 100 : 0}%`">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 📊 กล่องที่ 2: กำลังตรวจ / รอแก้ไข -->
+                        <div
+                            class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <p class="text-[11px] font-medium text-gray-500">กำลังตรวจ / รอแก้ไข</p>
+                                <span
+                                    class="text-[11px] font-bold text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded-full"
+                                    x-text="getPercent(pending, total) + '%'">0%</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-yellow-500 mb-2" x-text="pending">0</h3>
+
+                            <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                <div class="bg-yellow-400 h-1.5 rounded-full transition-all duration-500"
+                                    :style="`width: ${getPercent(pending, total)}%`"></div>
+                            </div>
+                        </div>
+
+                        <!-- 📊 กล่องที่ 3: ตรวจเสร็จแล้ว -->
+                        <div
+                            class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
+                            <div class="flex justify-between items-baseline mb-2">
+                                <p class="text-[11px] font-medium text-gray-500">ตรวจเสร็จแล้ว</p>
+                                <span
+                                    class="text-[11px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full"
+                                    x-text="getPercent(completed, total) + '%'">0%</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-green-600 mb-2" x-text="completed">0</h3>
+
+                            <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                <div class="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                                    :style="`width: ${getPercent(completed, total)}%`"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div> <!-- 📦 สิ้นสุด Card ใหญ่สีขาว -->
+
+            </div>
+
+
+
+        </div>
+
+
+
+        <!-- แผงประวัติแจ้งเตือนจาก Firebase FCM (ดึงข้อมูลมาจากกล่อง notifications ส่วนกลางมาโชว์เรียลไทม์) -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <span>⚠️</span> รายการล็อกแจ้งเตือน (Real-time FCM Log)
+            </h3>
+
+            <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                <!-- ทำการวนลูปดึงข้อมูลจากอาร์เรย์ของตึกใหญ่มาพ่นโชว์ดื้อๆ ได้ทันที -->
+                <template x-for="item in notifications" :key="item.id">
+                    <div
+                        class="p-4 bg-slate-50 border border-slate-100 rounded-lg hover:bg-slate-100 transition duration-150">
+                        <div class="flex justify-between items-start">
+                            <strong class="text-slate-800 font-medium text-sm" x-text="item.title"></strong>
+                            <span class="text-xs text-slate-400 font-mono" x-text="item.time"></span>
+                        </div>
+                        <p class="text-xs text-slate-600 mt-1" x-text="item.body"></p>
+                    </div>
+                </template>
+
+                <!-- แสดงผลเมื่อไม่มีรายการแจ้งเตือนค้างในตึก -->
+                <template x-if="notifications.length === 0">
+                    <div class="text-center py-8 text-slate-400 italic text-sm">
+                        ไม่มีประวัติการแจ้งเตือนพุชเข้ามาในขณะนี้...
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
-</div>
 
 
-<script>
-    // 📦 ถุงจำลองเก็บค่าฟังก์ชันคำนวณและดึงข้อมูลของหน้า Dashboard เท่านั้น
-    window.dashboardPage = {
-        init() {
-            console.log("⚡ หน้า Dashboard โหลดสำเร็จ: รันคำสั่งดึงยอดรวมสถิติตามรอบปกติ");
-        }
-    };
-    
-    // สั่งรันคำสั่งเริ่มต้นทำงานของหน้าตัวเอง
-    window.dashboardPage.init();
+    <script>
+        // 📦 ถุงจำลองเก็บค่าฟังก์ชันคำนวณและดึงข้อมูลของหน้า Dashboard เท่านั้น
+        window.dashboardPage = {
+            init() {
+                console.log("⚡ หน้า Dashboard โหลดสำเร็จ: รันคำสั่งดึงยอดรวมสถิติตามรอบปกติ");
+            },
 
-    // 🧹 ทำความสะอาดถุงข้อมูลเมื่อผู้ใช้กระโดดหนีไปเปิดเมนูหน้าอื่น เพื่อสุขอนามัยของแรมเครื่องคอมพิวเตอร์
-    window.currentPageCleanup = function() {
-        console.log("🧹 ล้างคลังความจำเฉพาะของหน้า Dashboard ออกเรียบร้อย");
-        window.dashboardPage = null;
-    };
-</script>
+
+
+
+
+            dashboardFilter(startdate, enddate) {
+
+                return {
+                    startDate: '',
+                    endDate: '',
+                    errorMessage: '',
+                    metrics: { total: 0, inProgress: 0, completed: 0 },
+                    // 1. คลังเก็บสถิติจำลองเฉพาะของหน้า Dashboard (ตัดขาดจาก Global app.js)
+                    total: 25,       /* จำนวนจ็อบทั้งหมด */
+                    pending: 10,     /* กำลังตรวจ/รอแก้ไข */
+                    completed: 15,   /* ตรวจเสร็จแล้ว */
+
+                    // 2. ฟังก์ชันสูตรคิดเปอร์เซ็นต์สดบนหน้าจอ ป้องกันการหารด้วยศูนย์ (Division by zero)
+                    getPercent(current, total) {
+                        if (!total || total === 0) return 0;
+                        return Math.round((current / total) * 100);
+                    },
+
+                    // 1. ตั้งค่าเริ่มต้นให้เป็นวันที่ปัจจุบัน และย้อนหลังไป 7 วัน
+                    initDates() {
+                        const today = new Date();
+                        const sevenDaysAgo = new Date();
+                        sevenDaysAgo.setDate(today.getDate() - 7);
+
+                        this.endDate = today.toISOString().split('T')[0];
+                        this.startDate = sevenDaysAgo.toISOString().split('T')[0];
+
+                        // ดึงข้อมูลครั้งแรกเมื่อโหลดหน้าเว็บ
+                        this.fetchData();
+                    },
+
+                    // 2. ฟังก์ชันตรวจสอบห้ามเลือกเกิน 1 เดือน
+                    validateRange() {
+                        this.errorMessage = '';
+
+                        if (!this.startDate || !this.endDate) return;
+
+                        const start = new Date(this.startDate);
+                        const end = new Date(this.endDate);
+
+                        // เช็กกรณีผู้ใช้เลือกวันเริ่มต้น หลัง วันสิ้นสุด
+                        if (start > end) {
+                            this.errorMessage = '❌ วันเริ่มต้องไม่เกินวันสิ้นสุดครับ';
+                            return false;
+                        }
+
+                        // คำนวณความต่างของเวลา (มิลลิวินาที)
+                        const diffTime = Math.abs(end - start);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        // ตรวจเงื่อนไขห้ามเกิน 31 วัน (1 เดือน)
+                        if (diffDays > 31) {
+                            this.errorMessage = `❌ เลือกช่วงวันที่ห่างกันได้ไม่เกิน 1 เดือน (คุณเลือก ${diffDays} วัน)`;
+                            return false;
+                        }
+
+                        return true;
+                    },
+
+                    // 3. ฟังก์ชันยิง API ดึงข้อมูลตามช่วงวันที่เลือก
+                    async fetchData() {
+                        if (!this.validateRange()) return;
+
+                        console.log(`ดึงข้อมูลตั้งแต่วันที่: ${this.startDate} ถึง ${this.endDate}`);
+
+                        // ตัวอย่าง: ยิง fetch ไปยัง backend ของคุณ
+                        // const res = await fetch(`/api/dashboard?start=${this.startDate}&end=${this.endDate}`);
+                        // const data = await res.json();
+
+                        // จำลองข้อมูลที่ได้กลับมาแสดงผลบนการ์ด
+                        this.metrics = {
+                            total: Math.floor(Math.random() * 50) + 10,
+                            inProgress: Math.floor(Math.random() * 10),
+                            completed: Math.floor(Math.random() * 20)
+                        };
+                    }
+                }
+            }
+        };
+
+        // สั่งรันคำสั่งเริ่มต้นทำงานของหน้าตัวเอง
+        window.dashboardPage.init();
+
+        // 🧹 ทำความสะอาดถุงข้อมูลเมื่อผู้ใช้กระโดดหนีไปเปิดเมนูหน้าอื่น เพื่อสุขอนามัยของแรมเครื่องคอมพิวเตอร์
+        window.currentPageCleanup = function () {
+            console.log("🧹 ล้างคลังความจำเฉพาะของหน้า Dashboard ออกเรียบร้อย");
+            window.dashboardPage = null;
+        };
+    </script>

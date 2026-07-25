@@ -1,7 +1,7 @@
 // app.js
 
 
-
+ 
 function spaApp() {
     return {
         isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
@@ -18,10 +18,10 @@ function spaApp() {
 
 
         currentDomain: window.location.hostname,
-          notifications: [],
+        notifications: [],
 
         // 🟢 เพิ่ม 2 บรรทัดนี้เข้าไปใน app.js เพื่อแก้เออร์เรอร์สีส้มทั้งหมด
-        activeTab: 'dashboard', 
+        activeTab: 'dashboard',
         toast: { show: false, title: '', body: '' },
 
         isSubmitting: false,
@@ -31,16 +31,30 @@ function spaApp() {
         currentRole: '',     // บทบาทงานที่กำลังใช้งานปัจจุบัน 
         menus: [],    // ตัวแปรส่งต่อไปประมวลผลวาด Recursive Menu
 
-           isMenuOpen: true,
+        isMenuOpen: true,
         async initApp() {
-             Alpine.store('mainApp', this);
+            Alpine.store('mainApp', this);
+
+
+            // วางโค้ดนี้ไว้ในฟังก์ชัน initApp() หรือจุดเริ่มต้นของแอปเพื่อทดสอบ
+            setInterval(() => {
+                const mockPayload = {
+                    notification: {
+                        title: "🔔 มีอัปเดตงานใหม่ " + new Date().toLocaleTimeString(),
+                        body: "ตรวจพบ Defect ใหม่ในห้อง 405 กรุณาตรวจสอบพิกัด"
+                    }
+                };
+
+                // เรียกใช้ฟังก์ชันจัดการ FCM ที่คุณเขียนไว้ในหน้าจอ
+                this.handleIncomingFCM(mockPayload);
+            }, 5000); // ยิงทดสอบทุกๆ 5 วินาที (เปลี่ยนตัวเลขได้)
             try {
 
-                 
+
                 // ดึงสิทธิ์คอนฟิกของระบบผ่าน Mock Service หรือ API จริง
                 let res = await window.SystemService.getTenantConfig(this.currentDomain);
                 console.log("ตั้งค่าเวอร์ชันระบบ:", res.VERSION);
-                
+
                 // ดักจับและต่อสายรับสัญญาน Firebase FCM ที่ลงทะเบียนไว้ที่จุดสตาร์ทจุดเดียว
                 window.addEventListener('fcm-core-received', (e) => {
                     this.handleIncomingFCM(e.detail);
@@ -55,13 +69,13 @@ function spaApp() {
             }
         },
 
-     
 
 
-         // --- 🔔 ระบบจัดการ Firebase (FCM) ศูนย์กลางประจำตึกหลัก ---
+
+        // --- 🔔 ระบบจัดการ Firebase (FCM) ศูนย์กลางประจำตึกหลัก ---
         handleIncomingFCM(payload) {
             console.log("แกนกลางจับสัญญาณ FCM สำเร็จ:", payload);
-            
+
             const title = payload.notification?.title || 'แจ้งเตือนระบบ';
             const body = payload.notification?.body || 'มีข้อมูลอัปเดตใหม่';
             const time = new Date().toLocaleTimeString('th-TH');
@@ -71,9 +85,10 @@ function spaApp() {
 
             // 2. เด้งป้าย Toast ลอยมุมขวาเพื่อแจ้งเตือนให้ผู้ใช้เห็นทันทีไม่ว่าจะอยู่หน้าไหน
             this.toast = { show: true, title, body };
+
             setTimeout(() => { this.toast.show = false; }, 4000); // ตั้งเวลา 4 วินาทีให้ป้ายหุบเก็บอัตโนมัติ
         },
-         // --- 🔄 ฟังก์ชันสลับแผ่นหน้ากาก HTML แบบ Dynamic (Router) ---
+        // --- 🔄 ฟังก์ชันสลับแผ่นหน้ากาก HTML แบบ Dynamic (Router) ---
         loadPage(pageUrl) {
             const targetDiv = document.getElementById('main-content-layout');
             if (!targetDiv) return;
@@ -112,41 +127,41 @@ function spaApp() {
                     console.error("โหลดหน้าจอไม่สำเร็จ:", err);
                     targetDiv.innerHTML = `<div class='p-4 bg-rose-50 text-rose-700 rounded-lg'>❌ ไม่สามารถดึงหน้าจอนี้ได้เนื่องจากข้อผิดพลาดของระบบ</div>`;
                 });
-              //  alert(100);
+            //  alert(100);
         },
 
         async handleLogin() {
             if (!this.username || !this.password) return alert('กรุณากรอกข้อมูลให้ครบ');
 
-           
-             if (this.username != 'admin' || this.password != '1234') {
+
+            if (this.username != 'admin' || this.password != '1234') {
                 alert('user pass not correct');
                 return;
-             }
-             let role_menus =   await window.SystemService.login('domain', 'username', 'password');
-                 this.menus =       role_menus[0].menus;
+            }
+            let role_menus = await window.SystemService.login('domain', 'username', 'password');
+            this.menus = role_menus[0].menus;
 
 
-                this.isSubmitting = true;
+            this.isSubmitting = true;
 
-                // จำลองการเช็คสิทธิ์ (คุณสามารถใส่ fetch ต่อ API จริงได้ตรงนี้)
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('savedUsername', this.username);
-                this.isLoggedIn = true;
+            // จำลองการเช็คสิทธิ์ (คุณสามารถใส่ fetch ต่อ API จริงได้ตรงนี้)
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('savedUsername', this.username);
+            this.isLoggedIn = true;
 
 
 
-                this.isLoggedIn = true;
-                await this.loadPage('dashboard.html');
+            this.isLoggedIn = true;
+            await this.loadPage('dashboard.html');
 
-                // 💡 รันระบบแจ้งเตือนแบบคู่ขนาน (Async Dynamic Import)
-                // import('./modules/system/services/notification.js').then(module => {
-                //     // ส่งต่อค่าตั้งค่า tenantConfig (ที่เก็บ Firebase Key แยกบริษัท) และชื่อโดเมนเข้าไปในเอนจิน
-                //     module.initPushNotification(this.tenantConfig, this.currentDomain);
-                // });
-                this.isSubmitting = false;
-                this.password = '';
-            
+            // 💡 รันระบบแจ้งเตือนแบบคู่ขนาน (Async Dynamic Import)
+            // import('./modules/system/services/notification.js').then(module => {
+            //     // ส่งต่อค่าตั้งค่า tenantConfig (ที่เก็บ Firebase Key แยกบริษัท) และชื่อโดเมนเข้าไปในเอนจิน
+            //     module.initPushNotification(this.tenantConfig, this.currentDomain);
+            // });
+            this.isSubmitting = false;
+            this.password = '';
+
         },
 
         setupUserSession(data) {
@@ -196,9 +211,9 @@ function spaApp() {
         }
 
 
-        
+
     }
 
-    
+
 }
- 
+
