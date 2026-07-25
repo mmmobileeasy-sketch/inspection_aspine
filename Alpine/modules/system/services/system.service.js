@@ -39,6 +39,8 @@ const SystemService = {
                 ],
                 "menus" :   [
                         { "id": "dashboard", "title": "ภาพรวมระบบ", "icon": "📊", "path": "dashboard.html" },
+                        { "id": "defect", "title": "ใบงาน Defect", "icon": "📋", "path": "modules/transaction/transaction.css" },
+                    
                         { "id": "tx_checklist", "title": "ใบงาน Checklist (Tx)", "icon": "📋", "path": "modules/transaction/transaction.css" }
                     
                        ,
