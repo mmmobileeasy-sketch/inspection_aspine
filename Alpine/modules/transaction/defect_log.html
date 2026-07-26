@@ -134,6 +134,10 @@
                                 </td>
                             </tr>
                         </template>
+                         <!-- กรณีพิมพ์ค้นหาแล้วไม่เจอข้อมูลใดๆ -->
+                        <template x-if="filteredDefects.length === 0">
+                            <tr><td colspan="7">❌ ไม่พบข้อมูลดีเฟกต์ย้อนหลังตามเงื่อนไขที่คุณระบุ</td></tr>
+                        </template>
 
                     </tbody>
                 </table>
@@ -193,4 +197,8 @@
             }
         }
     }
+    
+
+
+    
  </script>
