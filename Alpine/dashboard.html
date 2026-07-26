@@ -16,37 +16,17 @@
 
         <!-- คอนเทนเนอร์หลัก ครอบคลุมพื้นที่ขวาเต็มหน้าจอ -->
         <!-- คอนเทนเนอร์หลักขวาเต็มหน้าจอ -->
-        <div      class="flex flex-row flex-wrap gap-4 mb-6 w-full"
-    style="flex-direction: row !important; flex-wrap: wrap !important;">
+        <div class="flex flex-row flex-wrap gap-4 mb-6 w-full"
+            style="flex-direction: row !important; flex-wrap: wrap !important;">
 
             <!-- 📦 Card ใหญ่สีขาว (ครอบคลุมเนื้อหาทั้งหมด) -->
             <div
                 style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); width: 100%; display: flex; flex-direction: column; gap: 24px;">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 <!-- [1] ส่วนของปุ่มเลือกช่วงวันที่ (Date Filter) อยู่บนสุดข้างในการ์ดใหญ่ -->
                 <div style="background: #f9fafb; padding: 16px; border-radius: 12px; border: 1px solid #f3f4f6;">
                     <label style="font-weight: 500; color: #4b5563;">เลือกช่วงวันที่ตรวจคอนโด (สูงสุด 1 เดือน):</label>
                     <div style="display: flex; gap: 12px; margin-top: 8px; align-items: center;">
-
-
-
-
-
-
                         <div x-data="{ dateStart: '2026-07-16', dateEnd: '2026-07-22' }" class="mb-4">
                             <div x-init="
             setTimeout(() => {
@@ -107,20 +87,10 @@
 
 
 
-
-
-
-
-
-
-
-
-
                     </div>
 
                     <!-- [2] แผงตัวเลขสรุป 3 ใบ (Metrics Cards) แผ่เต็มหน้าจอภายใน -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
-
 
                         <!-- 📊 กล่องที่ 1: จ็อบตรวจทั้งหมด -->
                         <div
@@ -174,11 +144,65 @@
 
 
 
-                </div> <!-- 📦 สิ้นสุด Card ใหญ่สีขาว -->
+
+                    <!-- กรอบสีดำจำลองตามภาพของอินเตอร์เฟสคุณ -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
+
+                        <div class="w-full max-w-xl mx-auto my-6 mt-4">
+                            <div
+                                class="w-full bg-white rounded-lg border border-gray-300 p-3 shadow-sm flex items-center">
+                                <!-- 1. นำโค้ดชุดนี้ไปวางแทนที่กล่องกราฟเดิมทั้งหมด (มั่นใจว่าลบ tag เดิมที่มีไอคอนรูปภาพพังๆ ออกแล้ว) -->
+                                <div class="w-full px-4 my-6">
+                                    <div x-data="{ chart: null }" x-init="
+  chart = new Chart(document.getElementById('myChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+      datasets: [{
+        label: 'ทั้งหมด',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 1
+      },
+      {
+        label: 'กำลังตรวจ',
+        data: [68, 69, 80, 51, 56, 55, 70],
+        backgroundColor: 'rgba(56, 189, 248, 0.2)',
+        borderColor: 'rgba(56, 189, 248, 1)',
+        borderWidth: 1
+      },
+      {
+        label: 'ตรวจเสร็จแล้ว',
+        data: [25, 59, 70, 41, 56, 55, 40],
+        backgroundColor: 'rgba(52, 211, 153, 0.2)',
+        borderColor: 'rgba(52, 211, 153, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {}
+  });
+">
+                                        <h1>ผลการตรวจ</h1>
+                                        <hr>
+                                        <canvas id="myChart" width="800" height="400"></canvas>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+                    </div> <!-- 📦 สิ้นสุด Card ใหญ่สีขาว -->
+
+                </div>
+
+
+
+
 
             </div>
-
-
 
         </div>
 
@@ -304,6 +328,68 @@
                 }
             }
         };
+
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('flowbiteChartComponent', () => ({
+                // กำหนดข้อมูลตัวแปรสถิติของคุณ
+                total: 25,
+                pending: 10,
+                completed: 15,
+
+                init() {
+                    // รอให้ DOM และ x-ref เรนเดอร์บนเบราว์เซอร์เสร็จสิ้นก่อนวาดกราฟ
+                    this.$nextTick(() => {
+                        const options = {
+                            series: [
+                                {
+                                    name: 'กำลังตรวจ / รอแก้ไข',
+                                    data: [this.pending],
+                                    color: '#FBBF24' // สีเหลืองส้ม (40%)
+                                },
+                                {
+                                    name: 'ตรวจเสร็จแล้ว',
+                                    data: [this.completed],
+                                    color: '#10B981' // สีเขียว (60%)
+                                }
+                            ],
+                            chart: {
+                                type: 'bar',
+                                height: 50, // ปรับความสูงกราฟให้แบนติดแนวราบ
+                                stacked: true, // เปิดโหมดรวมแท่งให้ซ้อนต่อท้ายกัน
+                                stackType: 'normal',
+                                sparkline: {
+                                    enabled: true // โหมดซ่อนเส้นกริด แกนตัวเลข และขอบ เพื่อความคลีนสไตล์ Flowbite
+                                },
+                                toolbar: { show: false }
+                            },
+                            plotOptions: {
+                                bar: {
+                                    horizontal: true, // สั่งให้แท่งกราฟยืดเป็นแนวนอน
+                                    barHeight: '100%', // ความหนาของแถบกราฟเต็มพื้นที่บรรจุ
+                                    borderRadius: 0 // ตัดความโค้งมนออกเพื่อให้แท่งสองสีต่อชนกันสนิท
+                                }
+                            },
+                            stroke: { width: 0 },
+                            states: {
+                                hover: { filter: { type: 'none' } }
+                            },
+                            tooltip: {
+                                enabled: true,
+                                x: { show: false },
+                                y: {
+                                    formatter: (val) => `${val} งาน (${Math.round((val / this.total) * 100)}%)`
+                                }
+                            }
+                        };
+
+                        // สั่งเรนเดอร์กราฟใส่ Element ผ่าน x-ref ของ Alpine
+                        const chart = new ApexCharts(this.$refs.chartTimeline, options);
+                        chart.render();
+                    });
+                }
+            }));
+        });
 
         // สั่งรันคำสั่งเริ่มต้นทำงานของหน้าตัวเอง
         window.dashboardPage.init();
