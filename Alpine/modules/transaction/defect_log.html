@@ -1,0 +1,196 @@
+<!-- ─── ส่วนที่เพิ่มใหม่: ตารางรายการ Defect ที่บันทึกแล้ว ─── -->
+<div class="bg-[#f4f7fc] text-gray-800 font-sans antialiased p-6" x-data="defectLogComponent()">
+
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <!-- ส่วนหัวหน้าจอ (Header) -->
+        <div class="flex justify-between items-center bg-[#0b1c33] text-white p-5 rounded-2xl shadow-xs">
+            <div>
+                <span class="text-xs text-blue-400 font-bold tracking-wide uppercase">Condo Inspection Management</span>
+                <h1 class="text-2xl font-bold mt-0.5">📋 Defect Log (ประวัติรายการตรวจทั้งหมด)</h1>
+            </div>
+            <div class="bg-blue-600/20 px-4 py-2 rounded-xl border border-blue-500/30">
+                <span class="text-xs block text-gray-400">รายการทั้งหมดในระบบ</span>
+                <span class="text-lg font-bold text-blue-400" x-text="defects.length + ' จุด'">0 จุด</span>
+            </div>
+        </div>
+
+        <!-- แผงควบคุม ค้นหา และ ตัวกรองข้อมูล (Search & Filter Panel) -->
+        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-4">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 1. ช่องพิมพ์ค้นหาแบบ Real-time -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">ค้นหาด่วน (ระบุเลขห้อง หรือชื่อดีเฟกต์)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">🔍</span>
+                        <input type="text" x-model="searchQuery" placeholder="พิมพ์เลขห้อง เช่น 405..." 
+                               class="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white transition">
+                    </div>
+                </div>
+
+                <!-- 2. ตัวกรองหมวดหมู่ช่าง -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">กรองแยกตามหมวดหมู่งาน</label>
+                    <select x-model="filterCategory" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white transition cursor-pointer">
+                        <option value="all">🧱 แสดงทุกงานช่าง</option>
+                        <option value="architecture">🧱 งานสถาปัตย์</option>
+                        <option value="electrical">🔌 งานระบบไฟ</option>
+                        <option value="plumbing">💧 งานประปา</option>
+                    </select>
+                </div>
+
+                <!-- 3. ตัวกรองสถานะงานซ่อม -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1.5">กรองตามสถานะความคืบหน้า</label>
+                    <select x-model="filterStatus" class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white transition cursor-pointer">
+                        <option value="all">🟡 แสดงทุกสถานะ</option>
+                        <option value="pending">🔴 รวบรวมข้อมูล / รอดำเนินการ</option>
+                        <option value="fixing">🟠 กำลังแก้ไข</option>
+                        <option value="checking">🔵 ช่างส่งงาน / รอวิศวกรตรวจซ้ำ</option>
+                        <option value="passed">🟢 ตรวจผ่าน / ส่งมอบแล้ว</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ข้อความแจ้งเตือนจำนวนผลลัพธ์การค้นหาปัจจุบัน -->
+            <div class="text-xs text-gray-400 font-medium">
+                พบข้อมูลตรงตามเงื่อนไข <span class="font-bold text-blue-600" x-text="filteredDefects.length">0</span> รายการ
+            </div>
+        </div>
+
+        <!-- ตารางแสดงประวัติรายการตรวจ (Defect Log Table) -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-[#0b1c33]/5 text-gray-600 font-bold border-b border-gray-100">
+                            <th class="p-3.5 w-24 text-center">รหัสงาน</th>
+                            <th class="p-3.5 w-20 text-center">เลขห้อง</th>
+                            <th class="p-3.5 w-28">หมวดหมู่</th>
+                            <th class="p-3.5">อาการดีเฟกต์ที่พบ</th>
+                            <th class="p-3.5 w-20 text-center">ความรุนแรง</th>
+                            <th class="p-3.5 w-44 text-center">อัปเดตสถานะงาน</th>
+                            <th class="p-3.5 w-16 text-center">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <!-- วนลูปข้อมูลอัตโนมัติตามสเตตัสการกรองด้วย filteredDefects -->
+                        <template x-for="item in filteredDefects" :key="item.id">
+                            <tr class="hover:bg-gray-50/50 transition">
+                                <!-- 1. รหัสดีเฟกต์ -->
+                                <td class="p-3.5 text-center font-mono font-bold text-gray-500" x-text="item.id"></td>
+                                
+                                <!-- 2. เลขห้อง -->
+                                <td class="p-3.5 text-center">
+                                    <span class="bg-blue-50 text-blue-700 font-extrabold px-2.5 py-1 rounded-lg border border-blue-100" x-text="item.room"></span>
+                                </td>
+                                
+                                <!-- 3. หมวดหมู่ -->
+                                <td class="p-3.5 font-semibold text-gray-600">
+                                    <span x-show="item.category === 'architecture'">🧱 สถาปัตย์</span>
+                                    <span x-show="item.category === 'electrical'">🔌 ระบบไฟ</span>
+                                    <span x-show="item.category === 'plumbing'">💧 ประปา</span>
+                                </td>
+                                
+                                <!-- 4. อาการที่พบ -->
+                                <td class="p-3.5">
+                                    <div class="font-bold text-gray-800" x-text="item.title"></div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5" x-text="'บันทึกเมื่อ: ' + item.date"></div>
+                                </td>
+                                
+                                <!-- 5. ระดับความรุนแรง -->
+                                <td class="p-3.5 text-center">
+                                    <span :class="{
+                                        'text-green-600 bg-green-50 border-green-100': item.priority === 'low',
+                                        'text-amber-600 bg-amber-50 border-amber-100': item.priority === 'medium',
+                                        'text-red-600 bg-red-50 border-red-100': item.priority === 'high'
+                                    }" class="px-2 py-0.5 rounded-md font-extrabold border text-[10px]"
+                                    x-text="item.priority === 'low' ? 'ทั่วไป' : (item.priority === 'medium' ? 'เร่งด่วน' : 'วิกฤต')"></span>
+                                </td>
+                                
+                                <!-- 6. ตัวเลือกสลับเปลี่ยนสถานะงานซ่อมแบบ Dynamic Badge -->
+                                <td class="p-3.5 text-center">
+                                    <select :value="item.status" @change="updateStatus(item.id, $event.target.value)"
+                                            :class="{
+                                                'bg-red-50 text-red-700 border-red-200 focus:border-red-500': item.status === 'pending',
+                                                'bg-amber-50 text-amber-700 border-amber-200 focus:border-amber-500': item.status === 'fixing',
+                                                'bg-blue-50 text-blue-700 border-blue-200 focus:border-blue-500': item.status === 'checking',
+                                                'bg-green-50 text-green-700 border-green-200 focus:border-green-500': item.status === 'passed'
+                                            }"
+                                            class="px-2 py-1.5 border rounded-lg font-bold text-[11px] outline-none transition cursor-pointer">
+                                        <option value="pending">🔴 รอดำเนินการ</option>
+                                        <option value="fixing">🟠 กำลังแก้ไข</option>
+                                        <option value="checking">🔵 รอวิศวกรตรวจซ้ำ</option>
+                                        <option value="passed">🟢 ตรวจผ่านแล้ว</option>
+                                    </select>
+                                </td>
+                                
+                                <!-- 7. ปุ่มลบประวัติงาน -->
+                                <td class="p-3.5 text-center">
+                                    <button type="button" @click="deleteLog(item.id)" class="text-gray-400 hover:text-red-500 font-medium transition cursor-pointer text-sm">
+                                        🗑️
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+<script>
+     function defectLogComponent() {
+        return {
+            // 1. คลังข้อมูลดีเฟกต์จำลอง (Mock Data) สำหรับเปิดโชว์เดโมให้ลูกค้าดูสเตตัสต่างๆ
+            defects: [
+                { id: 'DF-001', room: '405', category: 'architecture', title: 'สีผนังลอกร่อน', priority: 'low', status: 'pending', date: '2026-07-26' },
+                { id: 'DF-002', room: '405', category: 'plumbing', title: 'ท่อน้ำทิ้งใต้ซิงค์รั่วซึม', priority: 'high', status: 'fixing', date: '2026-07-26' },
+                { id: 'DF-003', room: '512', category: 'electrical', title: 'ปลั๊กไฟไม่มีสัญญาณ', priority: 'medium', status: 'checking', date: '2026-07-25' },
+                { id: 'DF-004', room: '302', category: 'architecture', title: 'กระเบื้องพื้นโพรง/ร่อน', priority: 'high', status: 'passed', date: '2026-07-24' },
+                { id: 'DF-005', room: '208', category: 'electrical', title: 'ไฟดาวน์ไลท์กะพริบ', priority: 'low', status: 'passed', date: '2026-07-23' }
+            ],
+
+            // 2. ตัวแปรเก็บสถานะการค้นหาและการกรอง (Filter States)
+            searchQuery: '',       // คำค้นหา (เลขห้อง หรือ อาการ)
+            filterCategory: 'all', // ตัวกรองหมวดหมู่ (all, architecture, electrical, plumbing)
+            filterStatus: 'all',   // ตัวกรองสถานะงาน (all, pending, fixing, checking, passed)
+
+            // 3. ฟังก์ชันกรองข้อมูลแบบอัตโนมัติ (Computed Filter)
+            // ฟังก์ชันนี้จะกรองข้อมูลในตารางตามที่เราพิมพ์ค้นหาหรือกดเลือกแท็บทันทีแบบ Real-time
+            get filteredDefects() {
+                return this.defects.filter(item => {
+                    // กรองตามคำค้นหา (เลขห้อง หรือ ชื่อดีเฟกต์)
+                    const matchSearch = item.room.includes(this.searchQuery) || 
+                                        item.title.toLowerCase().includes(this.searchQuery.toLowerCase());
+                    
+                    // กรองตามหมวดหมู่ช่าง
+                    const matchCategory = this.filterCategory === 'all' || item.category === this.filterCategory;
+                    
+                    // กรองตามสถานะงานแก้ไข
+                    const matchStatus = this.filterStatus === 'all' || item.status === this.filterStatus;
+
+                    return matchSearch && matchCategory && matchStatus;
+                });
+            },
+
+            // 4. ฟังก์ชันสำหรับอัปเดตสถานะงาน (เช่น เมื่อช่างแก้เสร็จ หรือวิศวกรตรวจผ่าน)
+            // ในแอปจริงจุดนี้จะส่งค่าไปอัปเดตบนฐานข้อมูลหลังบ้าน
+            updateStatus(id, newStatus) {
+                const defect = this.defects.find(item => item.id === id);
+                if (defect) {
+                    defect.status = newStatus;
+                    alert(`อัปเดตรหัส ${id} เป็นสถานะใหม่เรียบร้อยแล้ว`);
+                }
+            },
+
+            // 5. ฟังก์ชันลบรายการดีเฟกต์ออกจากคลังข้อมูล
+            deleteLog(id) {
+                if (confirm(`คุณต้องการลบรายการดีเฟกต์รหัส ${id} ใช่หรือไม่?`)) {
+                    this.defects = this.defects.filter(item => item.id !== id);
+                }
+            }
+        }
+    }
+ </script>

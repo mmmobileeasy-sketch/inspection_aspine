@@ -1,0 +1,161 @@
+ 
+<div class="bg-[#f4f7fc] text-gray-800 font-sans antialiased p-4 md:p-6" x-data="defectInspection()">
+
+    <div class="max-w-2xl mx-auto space-y-5">
+        
+        <!-- ส่วนหัว: แสดงข้อมูลห้องที่กำลังตรวจ -->
+        <div class="flex justify-between items-center bg-[#0b1c33] text-white p-4 rounded-xl shadow-xs">
+            <div>
+                <span class="text-xs text-blue-400 font-bold tracking-wide uppercase">โครงการคอนโด A</span>
+                <h1 class="text-xl font-bold">ห้อง 405 (ชั้น 4)</h1>
+            </div>
+            <div class="text-right">
+                <span class="text-xs block text-gray-400">ผู้ตรวจ</span>
+                <span class="text-sm font-medium text-amber-400">⚡ วิศวกร Admin</span>
+            </div>
+        </div>
+
+        <!-- ฟอร์มหลักสำหรับการบันทึก Defect -->
+        <div class="bg-white rounded-2xl p-5 shadow-xs border border-gray-100 space-y-5">
+            
+            <!-- 1. เลือกหมวดหมู่งาน (ปุ่มกดขนาดใหญ่ เหมาะกับนิ้วมือตอนเดินตรวจ) -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">1. หมวดหมู่งาน</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" @click="changeCategory('architecture')" 
+                            :class="category === 'architecture' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 text-gray-700 border-gray-200'"
+                            class="py-3 px-2 border rounded-xl font-semibold text-sm transition flex flex-col items-center space-y-1 cursor-pointer">
+                        <span class="text-lg">🧱</span>
+                        <span>งานสถาปัตย์</span>
+                    </button>
+                    <button type="button" @click="changeCategory('electrical')" 
+                            :class="category === 'electrical' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 text-gray-700 border-gray-200'"
+                            class="py-3 px-2 border rounded-xl font-semibold text-sm transition flex flex-col items-center space-y-1 cursor-pointer">
+                        <span class="text-lg">🔌</span>
+                        <span>งานระบบไฟ</span>
+                    </button>
+                    <button type="button" @click="changeCategory('plumbing')" 
+                            :class="category === 'plumbing' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 text-gray-700 border-gray-200'"
+                            class="py-3 px-2 border rounded-xl font-semibold text-sm transition flex flex-col items-center space-y-1 cursor-pointer">
+                        <span class="text-lg">💧</span>
+                        <span>งานประปา</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. เลือกอาการที่พบ (Template ยอดนิยม ไม่ต้องพิมพ์เอง) -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">2. อาการ Defect ที่พบบ่อย</label>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="item in templates[category]" :key="item">
+                        <button type="button" @click="defectTitle = item"
+                                :class="defectTitle === item ? 'bg-amber-500 text-white border-amber-500' : 'bg-amber-50 text-amber-700 border-amber-200'"
+                                class="text-xs font-medium px-3 py-2 border rounded-lg transition cursor-pointer">
+                            <span x-text="item"></span>
+                        </button>
+                    </template>
+                </div>
+                
+                <!-- ช่องกรอกเพิ่มเติม (เผื่อกรณีไม่มีในระบบ) -->
+                <input type="text" x-model="defectTitle" placeholder="หรือระบุอาการอื่นๆ เพิ่มเติมที่นี่..." 
+                       class="w-full mt-3 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500 focus:bg-white transition">
+            </div>
+
+            <!-- 3. ถ่ายรูปหลักฐานความเสียหาย -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">3. ถ่ายรูป / แนบไฟล์หลักฐาน</label>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- ปุ่มกดอัปโหลดรูป/เปิดกล้องบนมือถือ -->
+                    <label class="border-2 border-dashed border-gray-300 hover:border-blue-500 bg-gray-50 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer transition h-32">
+                        <span class="text-2xl mb-1">📸</span>
+                        <span class="text-xs font-bold text-gray-500">กดเพื่อเปิดกล้อง</span>
+                        <span class="text-[10px] text-gray-400 mt-0.5">(หรือเลือกรูปภาพ)</span>
+                        <input type="file" accept="image/*" @change="previewImage" class="hidden">
+                    </label>
+
+                    <!-- กล่องพรีวิวรูปภาพที่เพิ่งถ่าย -->
+                    <div class="border border-gray-200 rounded-xl bg-gray-100 h-32 relative overflow-hidden flex items-center justify-center">
+                        <template x-if="imageSrc">
+                            <img :src="imageSrc" class="w-full h-full object-cover">
+                        </template>
+                        <template x-if="!imageSrc">
+                            <span class="text-xs text-gray-400">ยังไม่มีรูปภาพ</span>
+                        </template>
+                        <!-- ปุ่มลบรูป -->
+                        <template x-if="imageSrc">
+                            <button type="button" @click="imageSrc = null" class="absolute top-1.5 right-1.5 bg-red-600/80 text-white rounded-full p-1 text-xs hover:bg-red-600">✕</button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. ระบุความรุนแรงของดีเฟกต์ -->
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">4. ระดับความรุนแรง</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <label class="border border-gray-200 rounded-xl p-3 flex items-center space-x-2 bg-gray-50 cursor-pointer">
+                        <input type="radio" name="priority" value="low" x-model="priority" class="text-green-600 focus:ring-green-500">
+                        <span class="text-xs font-bold text-green-700">🟢 ทั่วไป</span>
+                    </label>
+                    <label class="border border-gray-200 rounded-xl p-3 flex items-center space-x-2 bg-gray-50 cursor-pointer">
+                        <input type="radio" name="priority" value="medium" x-model="priority" class="text-amber-600 focus:ring-amber-500">
+                        <span class="text-xs font-bold text-amber-700">🟡 เร่งด่วน</span>
+                    </label>
+                    <label class="border border-gray-200 rounded-xl p-3 flex items-center space-x-2 bg-gray-50 cursor-pointer">
+                        <input type="radio" name="priority" value="high" x-model="priority" class="text-red-600 focus:ring-red-500">
+                        <span class="text-xs font-bold text-red-700">🔴 วิกฤต</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ปุ่มบันทึกข้อมูลส่งเข้าระบบ -->
+            <div class="pt-2">
+                <button type="button" @click="saveDefect()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition transform active:scale-[0.98] cursor-pointer text-center">
+                    💾 บันทึกรายการ Defect นี้
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function defectInspection() {
+            return {
+                category: 'architecture', // หมวดหมู่เริ่มต้น
+                defectTitle: '',          // ชื่อดีเฟกต์ที่เลือก/กรอก
+                imageSrc: null,           // ลิงก์รูปภาพพรีวิว
+                priority: 'low',          // ระดับความรุนแรงเริ่มต้น
+
+                // คลังข้อมูลรายการที่พบบ่อย แยกตามหมวดหมู่ (วิศวกรจิ้มเลือกได้เลยไม่ต้องพิมพ์)
+                templates: {
+                    architecture: ['สีผนังลอกร่อน', 'กระเบื้องพื้นโพรง/ร่อน', 'บัวเชิงผนังมีช่องว่าง', 'วงกบประตูเป็นรอยขูดขีด', 'กระจกหน้าต่างร้าว'],
+                    electrical: ['ปลั๊กไฟไม่มีสัญญาณ', 'สวิตช์ไฟหลวม/เปิดไม่ติด', 'ฝาครอบบล็อกไฟเบี้ยว', 'ไฟดาวน์ไลท์กะพริบ', 'สายดินไม่ได้เชื่อมต่อ'],
+                    plumbing: ['ท่อน้ำทิ้งใต้ซิงค์รั่วซึม', 'ชลโครกกดน้ำไม่ลง', 'ก๊อกน้ำอ่างล้างหน้าไหลเบา', 'ยาแนวฐานชักโครกหลุด', 'พบน้ำขังที่พื้นห้องน้ำ']
+                },
+
+                // เปลี่ยนหมวดหมู่แล้วเคลียร์ค่าหัวข้อเก่าออก
+                changeCategory(cat) {
+                    this.category = cat;
+                    this.defectTitle = '';
+                },
+
+                // ฟังก์ชันอ่านไฟล์ภาพที่วิศวกรถ่ายรูปหน้างานมาพรีวิวโชว์บนหน้าจอ
+                previewImage(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        this.imageSrc = URL.createObjectURL(file);
+                    }
+                },
+
+                // แจ้งเตือนเมื่อกดบันทึกสำเร็จ (ในแอปจริงจุดนี้จะส่งค่าไปหลังบ้าน)
+                saveDefect() {
+                    if (!this.defectTitle) {
+                        alert('กรุณาระบุอาการ Defect ก่อนบันทึกครับ');
+                        return;
+                    }
+                    alert(`บันทึกสำเร็จ!\nหมวดหมู่: ${this.category}\nอาการ: ${this.defectTitle}\nความรุนแรง: ${this.priority}`);
+                    
+// เคลียร์ค่าเริ่มต้นเพื่อตรวจจุดถัดไป
+ this.defectTitle = '';this.imageSrc = null;this.priority = 'low';
+}}}
