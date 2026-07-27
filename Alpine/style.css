@@ -13,8 +13,8 @@ body {
 
 
 .card-main {
-    padding: 1.5rem; /* เทียบเท่า p-6 */
-    background-color: #b35252; /* เทียบเท่า bg-white */
+    padding: 0.5rem; /* เทียบเท่า p-6 */
+      background-color: #e8e7eb; /* เทียบเท่า bg-white */
     border-width: 1px; /* เทียบเท่า border */
     border-color: #f3f4f6; /* เทียบเท่า border-gray-100 */
     border-radius: 1rem; /* เทียบเท่า rounded-2xl */
@@ -23,8 +23,9 @@ body {
 
 
 .card-search {
+    margin-top: 3.5rem;
     padding: 1.5rem; /* เทียบเท่า p-6 */
-    background-color: #a59dcc; /* เทียบเท่า bg-white */
+    background-color: #efeef4; /* เทียบเท่า bg-white */
     border-width: 1px; /* เทียบเท่า border */
     border-color: #f3f4f6; /* เทียบเท่า border-gray-100 */
     border-radius: 1rem; /* เทียบเท่า rounded-2xl */
@@ -34,8 +35,8 @@ body {
 
 
 .card-child {
-    padding: 1.5rem; /* เทียบเท่า p-6 */
-    background-color: #e8e7eb; /* เทียบเท่า bg-white */
+    padding: 0.5rem; /* เทียบเท่า p-6 */
+    background-color: #ffffff; /* เทียบเท่า bg-white */
     border-width: 1px; /* เทียบเท่า border */
     border-color: #f3f4f6; /* เทียบเท่า border-gray-100 */
     border-radius: 1rem; /* เทียบเท่า rounded-2xl */

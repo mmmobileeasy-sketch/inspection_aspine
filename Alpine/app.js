@@ -11,10 +11,11 @@ function spaApp() {
         currentTab: 'overview',
         checklistData: [],
         isLoading: false,
+        txtHeader :'',
         appVersion: window.SystemConfig?.VERSION || '1.0.0',
 
         // ตัวแปรสำหรับเก็บโครงสร้าง HTML ที่ไปดึงมาจากไฟล์อื่น
-        pageHtml: '',
+        pageTitle: '',
 
 
         currentDomain: window.location.hostname,
@@ -89,7 +90,7 @@ function spaApp() {
             setTimeout(() => { this.toast.show = false; }, 4000); // ตั้งเวลา 4 วินาทีให้ป้ายหุบเก็บอัตโนมัติ
         },
         // --- 🔄 ฟังก์ชันสลับแผ่นหน้ากาก HTML แบบ Dynamic (Router) ---
-        loadPage(pageUrl) {
+        loadPage(pageUrl,pageTitle) {
             const targetDiv = document.getElementById('main-content-layout');
             if (!targetDiv) return;
 
@@ -98,7 +99,7 @@ function spaApp() {
                 window.currentPageCleanup();
                 window.currentPageCleanup = null;
             }
-
+            this.pageTitle = pageTitle;
             // จัดการยิงไปดึงรหัส HTML ของหน้าย่อยเป้าหมาย
             alert(pageUrl);
             fetch(pageUrl)

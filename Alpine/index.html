@@ -111,7 +111,7 @@
 
                                 <!-- เคสที่ A: เมนูเดี่ยวธรรมดา (ไม่มีเมนูย่อยซ้อนชั้น) -->
                                 <template x-if="!menu.children">
-                                    <button @click="activeTab = menu.id; loadPage(menu.path)"
+                                    <button @click="activeTab = menu.id; loadPage(menu.path,menu.title)"
                                         class="w-full flex items-center px-1 py-3 rounded-xl text-left transition duration-150 text-slate-300 hover:bg-slate-800"
                                         :class="activeTab === menu.id ? 'bg-blue-600 text-white font-semibold shadow-md shadow-blue-600/20' : ''"
                                         :title="menu.title"> <!-- ใส่ title เพื่อให้เมาส์ชี้แล้วขึ้นชื่อเมนูตอนหด -->
@@ -148,7 +148,7 @@
                                         <div x-show="open && isMenuOpen" x-transition
                                             class="pl-3 pr-2 space-y-1 border-l border-slate-800 ml-5">
                                             <template x-for="sub in menu.children" :key="sub.id">
-                                                <button @click="activeTab = sub.id; loadPage(sub.path)"
+                                                <button @click="activeTab = sub.id; loadPage(sub.path,sub.title)"
                                                     class="w-full px-2 py-2.5 text-xs rounded-lg text-left transition duration-100 text-slate-400 hover:text-white hover:bg-slate-800/50"
                                                     :class="activeTab === sub.id ? 'bg-slate-800 text-blue-400 font-bold' : ''">
 
@@ -176,14 +176,44 @@
             </div>
 
 
-            <div class=" flex-1 p-2 overflow-y-auto h-full">
+            <div class=" flex-1 overflow-y-auto h-full">
 
-                <div
-                    class="flex justify-between items-center bg-white p-2 mb-2 rounded-xl border border-slate-200 shadow-sm">
-                    <div>
-                        <h1 class="text-2xl font-bold text-slate-800">🏢 แผงภาพรวมระบบประจำโครงการ</h1>
+                <nav
+                    class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                    <div class="px-3 py-3 lg:px-5 lg:pl-3">
+                        <div class="flex items-center justify-between">
+
+                            <!-- ฝั่งซ้าย: รวมโลโก้ ชื่อระบบ และชื่อหน้าจอ -->
+                            <div class="flex items-center justify-start gap-4">
+
+                                <!-- 1. โลโก้ และ ชื่อระบบ -->
+                                <a href="#" class="flex ms-2 md:me-24 items-center gap-2">
+                                    <!-- เปลี่ยน src เป็นโลโก้คอนโดของคุณ -->
+                                    <img src="https://flowbite.com" class="h-8" alt="Condo Logo" />
+                                    <span
+                                        class="self-center text-xl font-bold sm:text-2xl whitespace-nowrap text-gray-900 dark:text-white">SmartCondo</span>
+                                </a>
+
+                                <!-- เส้นแบ่งบางๆ เพิ่มความเนี๊ยบ (Divider) -->
+                                <span class="text-gray-300 dark:text-gray-600 hidden md:block">|</span>
+
+                                <!-- 2. ชื่อหน้าจอ (Page Title) ปรับให้เด่น รู้ทันทีว่าอยู่หน้าไหน -->
+                                <h1 class="text-lg font-semibold text-gray-700 dark:text-gray-300 hidden md:block"
+                                    x-text="pageTitle">
+                                    <!-- ลบข้อความภาษาไทยเดิมออกได้เลย Alpine จะเอาค่าจากตัวแปรมาใส่ให้เอง -->
+                                </h1>
+                            </div>
+
+                            <!-- ฝั่งขวา: ปุ่มแจ้งเตือน และโปรไฟล์ผู้ใช้งาน -->
+                            <div class="flex items-center gap-3">
+                                <!-- ปุ่มกระดิ่งแจ้งเตือน / รูปโปรไฟล์ User -->
+                                <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
+                </nav>
+
                 <!-- 📌 แผงฝั่งขวา: กล่องพ่นเนื้อหาหน้าจอหลักขยายแผ่เต็มกว้าง 100% ตามขอบเขตหน้าจอ -->
                 <div class="card-main">
                     <main id="main-content-layout" <!-- ไฟล์หน้าย่อยอื่นๆ เช่น dashboard.html
