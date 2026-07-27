@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบแอปพลิเคชันหลังงาน</title>
-   
+
     <!-- 1. ดึงไฟล์สไตล์ระบบหลักและระบบ Tailwind มาฉีดวาดหน้าจอ (แก้ไขให้เป็นพาธถูกต้องแล้ว) -->
 
 
@@ -176,10 +176,21 @@
             </div>
 
 
-            <!-- 📌 แผงฝั่งขวา: กล่องพ่นเนื้อหาหน้าจอหลักขยายแผ่เต็มกว้าง 100% ตามขอบเขตหน้าจอ -->
-            <main id="main-content-layout" class="flex-1 p-2 overflow-y-auto h-full">
-                <!-- ไฟล์หน้าย่อยอื่นๆ เช่น dashboard.html จะถูกนำมาพ่นเปลี่ยนเฉพาะในโซนนี้อย่างสวยงาม -->
-            </main>
+            <div class=" flex-1 p-2 overflow-y-auto h-full">
+
+                <div
+                    class="flex justify-between items-center bg-white p-2 mb-2 rounded-xl border border-slate-200 shadow-sm">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">🏢 แผงภาพรวมระบบประจำโครงการ</h1>
+                    </div>
+                </div>
+                <!-- 📌 แผงฝั่งขวา: กล่องพ่นเนื้อหาหน้าจอหลักขยายแผ่เต็มกว้าง 100% ตามขอบเขตหน้าจอ -->
+                <div class="card-main">
+                    <main id="main-content-layout" <!-- ไฟล์หน้าย่อยอื่นๆ เช่น dashboard.html
+                        จะถูกนำมาพ่นเปลี่ยนเฉพาะในโซนนี้อย่างสวยงาม -->
+                    </main>
+                </div>
+            </div>
 
         </div>
     </template>
@@ -193,16 +204,16 @@
             <p class="text-xs text-slate-300 mt-1" x-text="toast.body"></p>
         </div>
     </div>
-  <!-- 📍 1. ดึงไฟล์สไตล์ CSS ของปฏิทินจากตัว Package ในเครื่อง -->
+    <!-- 📍 1. ดึงไฟล์สไตล์ CSS ของปฏิทินจากตัว Package ในเครื่อง -->
     <link rel="stylesheet" href="./node_modules/flowbite-datepicker/dist/css/datepicker.min.css">
 
     <!-- 📍 2. ดึงไฟล์ JavaScript ของ DateRangePicker จากตัว Package ในเครื่อง -->
     <script src="./node_modules/flowbite-datepicker/dist/js/datepicker-full.min.js"></script>
 
     <!-- 📍 3. ดึงไฟล์แปลภาษาไทยสำเร็จรูป (i18n th) จากตัว Package มาใช้งานตรงๆ -->
-   
+
     <script src="./node_modules/flowbite-datepicker/dist/js/locales/th.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- 2. ดึงไฟล์ Logic และคลัง Service (แก้ไขพาธตรงไปที่โฟลเดอร์ด้านนอกตามโครงสร้างจริงของคุณ) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -211,9 +222,9 @@
 
 
 
-    
-     
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     <script src="/app.js"></script>
 
 

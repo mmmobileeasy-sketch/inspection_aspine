@@ -10,6 +10,52 @@ body {
             overflow: hidden;
 }
 
+
+
+.card-main {
+    padding: 1.5rem; /* เทียบเท่า p-6 */
+    background-color: #b35252; /* เทียบเท่า bg-white */
+    border-width: 1px; /* เทียบเท่า border */
+    border-color: #f3f4f6; /* เทียบเท่า border-gray-100 */
+    border-radius: 1rem; /* เทียบเท่า rounded-2xl */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* เทียบเท่า shadow-xs */
+}
+
+
+.card-search {
+    padding: 1.5rem; /* เทียบเท่า p-6 */
+    background-color: #a59dcc; /* เทียบเท่า bg-white */
+    border-width: 1px; /* เทียบเท่า border */
+    border-color: #f3f4f6; /* เทียบเท่า border-gray-100 */
+    border-radius: 1rem; /* เทียบเท่า rounded-2xl */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* เทียบเท่า shadow-xs */
+}
+
+
+
+.card-child {
+    padding: 1.5rem; /* เทียบเท่า p-6 */
+    background-color: #e8e7eb; /* เทียบเท่า bg-white */
+    border-width: 1px; /* เทียบเท่า border */
+    border-color: #f3f4f6; /* เทียบเท่า border-gray-100 */
+    border-radius: 1rem; /* เทียบเท่า rounded-2xl */
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* เทียบเท่า shadow-xs */
+}
+
+.card-caption-title {
+    font-size: 1.125rem; /* เทียบเท่า text-lg */
+    font-weight: 700;    /* เทียบเท่า font-bold */
+    color: #1e293b;      /* สีข้อความน้ำเงินเข้ม (slate-800) */
+    margin-bottom: 0.25rem;
+}
+
+.card-caption-desc {
+    font-size: 0.875rem; /* เทียบเท่า text-sm */
+    color: #64748b;      /* สีข้อความคำอธิบายสีเทา (slate-500) */
+    margin-bottom: 1.25rem; /* เว้นระยะห่างก่อนเริ่มตัวฟิลเตอร์ด้านล่าง */
+    padding-top: 1rem;
+}
+
 /* 🎯 โซนสร้างคลาสส่วนกลางสำหรับให้ทุกหน้าดึงไป Reuse */
 
 /* 1. คลาสปุ่มกดหลักของระบบแอป (ดึงคำสั่ง Tailwind มารวมกัน) */

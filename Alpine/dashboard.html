@@ -1,13 +1,7 @@
 <!-- เปิดหน้าด้วยเนื้อหาหลักทันที ตั้งค่า ID เพื่อให้ปุ่มเมนูบาร์รู้ตำแหน่งและสับเปลี่ยนสีได้ถูกต้อง -->
 <div id="dashboard" class="space-y-6">
 
-    <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">🏢 แผงภาพรวมระบบประจำโครงการ</h1>
-            <p class="text-slate-500 text-sm mt-1">ยินดีต้อนรับกลับมา, <span class="font-semibold text-slate-700"
-                    x-text="username"></span></p>
-        </div>
-    </div>
+
 
 
 
@@ -16,19 +10,108 @@
 
         <!-- คอนเทนเนอร์หลัก ครอบคลุมพื้นที่ขวาเต็มหน้าจอ -->
         <!-- คอนเทนเนอร์หลักขวาเต็มหน้าจอ -->
-        <div class="flex flex-row flex-wrap gap-4 mb-6 w-full"
-            style="flex-direction: row !important; flex-wrap: wrap !important;">
+      
+            <div class="grid grid-cols-12 gap-4 w-full">
+                <!-- 📦 Card ใหญ่สีขาว (ครอบคลุมเนื้อหาทั้งหมด) -->
+                <div class="col-span-12 p-5 card-search">
 
-            <!-- 📦 Card ใหญ่สีขาว (ครอบคลุมเนื้อหาทั้งหมด) -->
-            <div
-                style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); width: 100%; display: flex; flex-direction: column; gap: 24px;">
+                    <!-- ใช้ Grid ซ้อนข้างในตัวการ์ดเพื่อตัดแบ่งฝั่งซ้าย-ขวา -->
+                    <div class="grid grid-cols-12 gap-4 items-end">
+                        <div class="col-span-12 lg:col-span-5">
+                            <div x-data="{
+    open: false,
+    options: [
+        { value: 'FR', label: 'กราฟภาพรวมสัดส่วนสถานะงาน' },
+        { value: 'EG', label: 'กราฟจุดที่พบ Defect บ่อยที่สุด แยกตามหมวดหมู่' },
+        { value: 'US', label: 'กราฟความคืบหน้าแยกตามรายชั้น หรือ รายตึก ' },
+        { value: 'JP', label: 'กราฟระยะเวลาเฉลี่ยในการปิดงาน' }
+    ],
+    selected: ['FR', 'EG'], // ค่าเริ่มต้นที่เลือก (ตามรูปตัวอย่าง)
+    toggle(value) {
+        if (this.selected.includes(value)) {
+            this.selected = this.selected.filter(item => item !== value);
+        } else {
+            this.selected.push(value);
+        }
+    },
+    remove(value) {
+        this.selected = this.selected.filter(item => item !== value);
+    },
+    get selectedLabels() {
+        return this.options.filter(opt => this.selected.includes(opt.value));
+    }
+}">
+                                <!-- 1. แท็ก Label สำหรับใส่ชื่อหัวข้อดรอปดาวน์ -->
+                                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                    ประเภทกราฟที่ต้องการแสดงผล
+                                </label>
 
-                <!-- [1] ส่วนของปุ่มเลือกช่วงวันที่ (Date Filter) อยู่บนสุดข้างในการ์ดใหญ่ -->
-                <div style="background: #f9fafb; padding: 16px; border-radius: 12px; border: 1px solid #f3f4f6;">
-                    <label style="font-weight: 500; color: #4b5563;">เลือกช่วงวันที่ตรวจคอนโด (สูงสุด 1 เดือน):</label>
-                    <div style="display: flex; gap: 12px; margin-top: 8px; align-items: center;">
-                        <div x-data="{ dateStart: '2026-07-16', dateEnd: '2026-07-22' }" class="mb-4">
-                            <div x-init="
+                                <!-- ส่วนจำลองช่อง Input / ตัวกด Dropdown -->
+                                <div @click="open = !open" @click.outside="open = false"
+                                    class="flex flex-wrap items-center gap-2 p-2.5 min-h-[46px] w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+
+                                    <!-- ข้อความแจ้งเตือนกรณีไม่ได้เลือกอะไรเลย -->
+                                    <span x-show="selected.length === 0" class="text-gray-500">Select
+                                        countries...</span>
+
+                                    <!-- เม็ด Chips/Badges สไตล์ Flowbite ที่ถูกเลือก -->
+                                    <template x-for="item in selectedLabels" :key="item.value">
+                                        <span
+                                            class="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-800 bg-gray-200 rounded dark:bg-gray-600 dark:text-gray-200">
+                                            <span x-text="item.label"></span>
+                                            <!-- ปุ่มกดลบ Chip -->
+                                            <button type="button" @click.stop="remove(item.value)"
+                                                class="inline-flex items-center p-0.5 ms-1.5 text-gray-400 bg-transparent rounded-xs hover:bg-gray-300 hover:text-gray-900 dark:hover:bg-gray-500 dark:hover:text-gray-100">
+                                                <svg class="w-2 h-2" aria-hidden="true" xmlns="http://w3.org"
+                                                    fill="none" viewBox="0 0 14 14">
+                                                    <path stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2"
+                                                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    </template>
+
+                                    <!-- ไอคอนลูกศรขวาขอบด้านท้าย -->
+                                    <div class="ms-auto flex items-center pr-1 text-gray-500">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <!-- หน้าต่างตัวเลือก Dropdown (Flowbite Dropdown Style) -->
+                                <div x-show="open" x-transition
+                                    class="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-sm dark:bg-gray-800 border border-gray-200 dark:border-gray-700 max-h-60 overflow-y-auto"
+                                    style="display: none;">
+                                    <ul class="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200">
+                                        <template x-for="opt in options" :key="opt.value">
+                                            <li>
+                                                <div
+                                                    class="flex items-center p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <!-- กล่อง Checkbox ของ Flowbite -->
+                                                    <input type="checkbox" :id="'chk-' + opt.value"
+                                                        :checked="selected.includes(opt.value)"
+                                                        @change="toggle(opt.value)"
+                                                        class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                                    <!-- ป้ายข้อความชื่อตัวเลือก -->
+                                                    <label :for="'chk-' + opt.value" x-text="opt.label"
+                                                        class="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300 cursor-pointer"></label>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="col-span-12 lg:col-span-7 flex flex-wrap items-center gap-x-3 gap-y-2 justify-start">
+
+                            <label style="font-weight: 500; color: #4b5563;">เลือกช่วงวันที่ตรวจคอนโด (สูงสุด 1
+                                เดือน):</label>
+                            <div style="display: flex; gap: 12px; margin-top: 8px; align-items: center;">
+                                <div x-data="{ dateStart: '2026-07-16', dateEnd: '2026-07-22' }" class="mb-4">
+                                    <div x-init="
             setTimeout(() => {
                 if (typeof DateRangePicker !== 'undefined') {
                     // เปิดใช้งานปฏิทินช่วงวันที่ โดยระบุภาษาไทยสำเร็จรูปจาก Package ในเครื่อง
@@ -49,111 +132,147 @@
                 });
             });
         " class="flex items-center space-x-2">
-                                <div class="relative w-44">
-                                    <div
-                                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-xs text-gray-400">
-                                        📅</div>
-                                    <input name="start" type="text" x-model="dateStart"
-                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-9 p-2 cursor-pointer">
-                                </div>
-                                <span class="text-gray-500 text-sm">to</span>
-                                <div class="relative w-44">
-                                    <div
-                                        class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-xs text-gray-400">
-                                        📅</div>
-                                    <input name="end" type="text" x-model="dateEnd"
-                                        class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-9 p-2 cursor-pointer">
+                                        <div class="relative w-44">
+                                            <div
+                                                class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-xs text-gray-400">
+                                                📅</div>
+                                            <input name="start" type="text" x-model="dateStart"
+                                                class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-9 p-2 cursor-pointer">
+                                        </div>
+                                        <span class="text-gray-500 text-sm">to</span>
+                                        <div class="relative w-44">
+                                            <div
+                                                class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-xs text-gray-400">
+                                                📅</div>
+                                            <input name="end" type="text" x-model="dateEnd"
+                                                class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-9 p-2 cursor-pointer">
+                                        </div>
+
+                                        <button @click="window.dashboardPage.dashboardFilter(dateStart, dateEnd)"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center w-10 h-10 rounded-lg transition-colors ml-2 shadow-sm">
+                                            <!-- ไอคอนแว่นขยาย (Search Icon) ขนาดพอดีสวยงาม -->
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://w3.org">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <style>
+                                        .datepicker {
+                                            z-index: 99999 !important;
+                                        }
+                                    </style>
                                 </div>
 
-                                <button @click="window.dashboardPage.dashboardFilter(dateStart, dateEnd)"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center w-10 h-10 rounded-lg transition-colors ml-2 shadow-sm">
-                                    <!-- ไอคอนแว่นขยาย (Search Icon) ขนาดพอดีสวยงาม -->
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                        xmlns="http://w3.org">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </button>
+
+
+
+
+
                             </div>
-                            <style>
-                                .datepicker {
-                                    z-index: 99999 !important;
-                                }
-                            </style>
+
                         </div>
-
-
-
-
-
 
                     </div>
+                </div>
 
-                    <!-- [2] แผงตัวเลขสรุป 3 ใบ (Metrics Cards) แผ่เต็มหน้าจอภายใน -->
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
 
-                        <!-- 📊 กล่องที่ 1: จ็อบตรวจทั้งหมด -->
-                        <div
-                            class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
-                            <div class="flex justify-between items-baseline mb-2">
-                                <p class="text-[11px] font-medium text-gray-500">จ็อบตรวจทั้งหมด</p>
-                                <span class="text-[11px] font-bold text-gray-700">100%</span>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-2" x-text="total">0</h3>
 
-                            <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                <div class="bg-gray-400 h-1.5 rounded-full" :style="`width: ${total > 0 ? 100 : 0}%`">
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-span-12 lg:col-span-12 card-child ">
+                    <!-- 🟢 2. กล่องฝั่งซ้าย: รวมเฉพาะข้อความหัวข้อและคำอธิบาย (เปิด-ปิดคลุมแค่ตรงนี้) -->
+                    <div class="w-full ">
+                        <h3 class="card-caption-title">ตัวกรองสถิติและรายงานผล</h3>
+                        <p class="card-caption-desc">
+                            เลือกประเภทการแสดงผลของกราฟและกำหนดช่วงสัปดาห์หรือช่วงวันที่ที่ต้องการเรียกดูข้อมูลการตรวจรับคอนโด
+                        </p>
+                    </div> <!-- 👈 สังเกตแท็กปิดกล่องข้อความตรงนี้นะครับ ต้องปิดก่อนเริ่มปุ่ม -->
 
-                        <!-- 📊 กล่องที่ 2: กำลังตรวจ / รอแก้ไข -->
-                        <div
-                            class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
-                            <div class="flex justify-between items-baseline mb-2">
-                                <p class="text-[11px] font-medium text-gray-500">กำลังตรวจ / รอแก้ไข</p>
-                                <span
-                                    class="text-[11px] font-bold text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded-full"
-                                    x-text="getPercent(pending, total) + '%'">0%</span>
-                            </div>
-                            <h3 class="text-xl font-bold text-yellow-500 mb-2" x-text="pending">0</h3>
-
-                            <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                <div class="bg-yellow-400 h-1.5 rounded-full transition-all duration-500"
-                                    :style="`width: ${getPercent(pending, total)}%`"></div>
-                            </div>
-                        </div>
-
-                        <!-- 📊 กล่องที่ 3: ตรวจเสร็จแล้ว -->
-                        <div
-                            class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
-                            <div class="flex justify-between items-baseline mb-2">
-                                <p class="text-[11px] font-medium text-gray-500">ตรวจเสร็จแล้ว</p>
-                                <span
-                                    class="text-[11px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full"
-                                    x-text="getPercent(completed, total) + '%'">0%</span>
-                            </div>
-                            <h3 class="text-xl font-bold text-green-600 mb-2" x-text="completed">0</h3>
-
-                            <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                <div class="bg-green-500 h-1.5 rounded-full transition-all duration-500"
-                                    :style="`width: ${getPercent(completed, total)}%`"></div>
-                            </div>
-                        </div>
+                    <!-- 🔵 3. กล่องฝั่งขวา: ใส่เฉพาะปุ่มดาวน์โหลดรายงาน (อยู่นอกกล่องข้อความ แต่อยู่ในกล่องแม่เดียวกัน) -->
+                    <div class="flex-shrink-0">
+                        <button type="button"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                            <!-- ไอคอนดาวน์โหลด -->
+                            <svg class="w-4 h-4 me-2 text-gray-500" aria-hidden="true" xmlns="http://w3.org" fill="none"
+                                viewBox="0 0 20 20">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M4 15v1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Download Report
+                        </button>
                     </div>
 
+                    <!-- [1] ส่วนของปุ่มเลือกช่วงวันที่ (Date Filter) อยู่บนสุดข้างในการ์ดใหญ่ -->
+                    <div style="background: #f9fafb; padding: 16px; border-radius: 12px; border: 1px solid #f3f4f6;">
 
 
+                        <!-- [2] แผงตัวเลขสรุป 3 ใบ (Metrics Cards) แผ่เต็มหน้าจอภายใน -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
 
-                    <!-- กรอบสีดำจำลองตามภาพของอินเตอร์เฟสคุณ -->
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
-
-                        <div class="w-full max-w-xl mx-auto my-6 mt-4">
+                            <!-- 📊 กล่องที่ 1: จ็อบตรวจทั้งหมด -->
                             <div
-                                class="w-full bg-white rounded-lg border border-gray-300 p-3 shadow-sm flex items-center">
-                                <!-- 1. นำโค้ดชุดนี้ไปวางแทนที่กล่องกราฟเดิมทั้งหมด (มั่นใจว่าลบ tag เดิมที่มีไอคอนรูปภาพพังๆ ออกแล้ว) -->
-                                <div class="w-full px-4 my-6">
-                                    <div x-data="{ chart: null }" x-init="
+                                class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
+                                <div class="flex justify-between items-baseline mb-2">
+                                    <p class="text-[11px] font-medium text-gray-500">จ็อบตรวจทั้งหมด</p>
+                                    <span class="text-[11px] font-bold text-gray-700">100%</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2" x-text="total">0</h3>
+
+                                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div class="bg-gray-400 h-1.5 rounded-full"
+                                        :style="`width: ${total > 0 ? 100 : 0}%`">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 📊 กล่องที่ 2: กำลังตรวจ / รอแก้ไข -->
+                            <div
+                                class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
+                                <div class="flex justify-between items-baseline mb-2">
+                                    <p class="text-[11px] font-medium text-gray-500">กำลังตรวจ / รอแก้ไข</p>
+                                    <span
+                                        class="text-[11px] font-bold text-yellow-600 bg-yellow-50 px-1.5 py-0.5 rounded-full"
+                                        x-text="getPercent(pending, total) + '%'">0%</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-yellow-500 mb-2" x-text="pending">0</h3>
+
+                                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div class="bg-yellow-400 h-1.5 rounded-full transition-all duration-500"
+                                        :style="`width: ${getPercent(pending, total)}%`"></div>
+                                </div>
+                            </div>
+
+                            <!-- 📊 กล่องที่ 3: ตรวจเสร็จแล้ว -->
+                            <div
+                                class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex-1 min-w-[140px] max-w-full">
+                                <div class="flex justify-between items-baseline mb-2">
+                                    <p class="text-[11px] font-medium text-gray-500">ตรวจเสร็จแล้ว</p>
+                                    <span
+                                        class="text-[11px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full"
+                                        x-text="getPercent(completed, total) + '%'">0%</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-green-600 mb-2" x-text="completed">0</h3>
+
+                                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div class="bg-green-500 h-1.5 rounded-full transition-all duration-500"
+                                        :style="`width: ${getPercent(completed, total)}%`"></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+                        <!-- กรอบสีดำจำลองตามภาพของอินเตอร์เฟสคุณ -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%;">
+
+                            <div class="w-full max-w-xl mx-auto my-6 mt-4">
+                                <div
+                                    class="w-full bg-white rounded-lg border border-gray-300 p-3 shadow-sm flex items-center">
+                                    <!-- 1. นำโค้ดชุดนี้ไปวางแทนที่กล่องกราฟเดิมทั้งหมด (มั่นใจว่าลบ tag เดิมที่มีไอคอนรูปภาพพังๆ ออกแล้ว) -->
+                                    <div class="w-full px-4 my-6">
+                                        <div x-data="{ chart: null }" x-init="
   chart = new Chart(document.getElementById('myChart').getContext('2d'), {
     type: 'line',
     data: {
@@ -183,19 +302,20 @@
     options: {}
   });
 ">
-                                        <h1>ผลการตรวจ</h1>
-                                        <hr>
-                                        <canvas id="myChart" width="800" height="400"></canvas>
+                                            <h1>ผลการตรวจ</h1>
+                                            <hr>
+                                            <canvas id="myChart" width="800" height="400"></canvas>
+                                        </div>
                                     </div>
+
+
                                 </div>
-
-
                             </div>
-                        </div>
 
 
-                    </div> <!-- 📦 สิ้นสุด Card ใหญ่สีขาว -->
+                        </div> <!-- 📦 สิ้นสุด Card ใหญ่สีขาว -->
 
+                    </div>
                 </div>
 
 
@@ -204,199 +324,206 @@
 
             </div>
 
-        </div>
 
 
+            <!-- แผงประวัติแจ้งเตือนจาก Firebase FCM (ดึงข้อมูลมาจากกล่อง notifications ส่วนกลางมาโชว์เรียลไทม์) -->
+            <div class="col-span-12 md:col-span-7 flex flex-col justify-end">
+                <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span>⚠️</span> รายการล็อกแจ้งเตือน (Real-time FCM Log)
+                </h3>
 
-        <!-- แผงประวัติแจ้งเตือนจาก Firebase FCM (ดึงข้อมูลมาจากกล่อง notifications ส่วนกลางมาโชว์เรียลไทม์) -->
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span>⚠️</span> รายการล็อกแจ้งเตือน (Real-time FCM Log)
-            </h3>
-
-            <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
-                <!-- ทำการวนลูปดึงข้อมูลจากอาร์เรย์ของตึกใหญ่มาพ่นโชว์ดื้อๆ ได้ทันที -->
-                <template x-for="item in notifications" :key="item.id">
-                    <div
-                        class="p-4 bg-slate-50 border border-slate-100 rounded-lg hover:bg-slate-100 transition duration-150">
-                        <div class="flex justify-between items-start">
-                            <strong class="text-slate-800 font-medium text-sm" x-text="item.title"></strong>
-                            <span class="text-xs text-slate-400 font-mono" x-text="item.time"></span>
+                <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    <!-- ทำการวนลูปดึงข้อมูลจากอาร์เรย์ของตึกใหญ่มาพ่นโชว์ดื้อๆ ได้ทันที -->
+                    <template x-for="item in notifications" :key="item.id">
+                        <div
+                            class="p-4 bg-slate-50 border border-slate-100 rounded-lg hover:bg-slate-100 transition duration-150">
+                            <div class="flex justify-between items-start">
+                                <strong class="text-slate-800 font-medium text-sm" x-text="item.title"></strong>
+                                <span class="text-xs text-slate-400 font-mono" x-text="item.time"></span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1" x-text="item.body"></p>
                         </div>
-                        <p class="text-xs text-slate-600 mt-1" x-text="item.body"></p>
-                    </div>
-                </template>
+                    </template>
 
-                <!-- แสดงผลเมื่อไม่มีรายการแจ้งเตือนค้างในตึก -->
-                <template x-if="notifications.length === 0">
-                    <div class="text-center py-8 text-slate-400 italic text-sm">
-                        ไม่มีประวัติการแจ้งเตือนพุชเข้ามาในขณะนี้...
-                    </div>
-                </template>
+                    <!-- แสดงผลเมื่อไม่มีรายการแจ้งเตือนค้างในตึก -->
+                    <template x-if="notifications.length === 0">
+                        <div class="text-center py-8 text-slate-400 italic text-sm">
+                            ไม่มีประวัติการแจ้งเตือนพุชเข้ามาในขณะนี้...
+                        </div>
+                    </template>
+                </div>
             </div>
-        </div>
+
+     
     </div>
 
 
-    <script>
-        // 📦 ถุงจำลองเก็บค่าฟังก์ชันคำนวณและดึงข้อมูลของหน้า Dashboard เท่านั้น
-        window.dashboardPage = {
-            init() {
-                console.log("⚡ หน้า Dashboard โหลดสำเร็จ: รันคำสั่งดึงยอดรวมสถิติตามรอบปกติ");
-            },
+</div>
 
 
 
 
 
-            dashboardFilter(startdate, enddate) {
 
-                return {
-                    startDate: '',
-                    endDate: '',
-                    errorMessage: '',
-                    metrics: { total: 0, inProgress: 0, completed: 0 },
-                    // 1. คลังเก็บสถิติจำลองเฉพาะของหน้า Dashboard (ตัดขาดจาก Global app.js)
-                    total: 25,       /* จำนวนจ็อบทั้งหมด */
-                    pending: 10,     /* กำลังตรวจ/รอแก้ไข */
-                    completed: 15,   /* ตรวจเสร็จแล้ว */
+<script>
+    // 📦 ถุงจำลองเก็บค่าฟังก์ชันคำนวณและดึงข้อมูลของหน้า Dashboard เท่านั้น
+    window.dashboardPage = {
+        init() {
+            console.log("⚡ หน้า Dashboard โหลดสำเร็จ: รันคำสั่งดึงยอดรวมสถิติตามรอบปกติ");
+        },
 
-                    // 2. ฟังก์ชันสูตรคิดเปอร์เซ็นต์สดบนหน้าจอ ป้องกันการหารด้วยศูนย์ (Division by zero)
-                    getPercent(current, total) {
-                        if (!total || total === 0) return 0;
-                        return Math.round((current / total) * 100);
-                    },
 
-                    // 1. ตั้งค่าเริ่มต้นให้เป็นวันที่ปัจจุบัน และย้อนหลังไป 7 วัน
-                    initDates() {
-                        const today = new Date();
-                        const sevenDaysAgo = new Date();
-                        sevenDaysAgo.setDate(today.getDate() - 7);
 
-                        this.endDate = today.toISOString().split('T')[0];
-                        this.startDate = sevenDaysAgo.toISOString().split('T')[0];
 
-                        // ดึงข้อมูลครั้งแรกเมื่อโหลดหน้าเว็บ
-                        this.fetchData();
-                    },
 
-                    // 2. ฟังก์ชันตรวจสอบห้ามเลือกเกิน 1 เดือน
-                    validateRange() {
-                        this.errorMessage = '';
+        dashboardFilter(startdate, enddate) {
 
-                        if (!this.startDate || !this.endDate) return;
+            return {
+                startDate: '',
+                endDate: '',
+                errorMessage: '',
+                metrics: { total: 0, inProgress: 0, completed: 0 },
+                // 1. คลังเก็บสถิติจำลองเฉพาะของหน้า Dashboard (ตัดขาดจาก Global app.js)
+                total: 25,       /* จำนวนจ็อบทั้งหมด */
+                pending: 10,     /* กำลังตรวจ/รอแก้ไข */
+                completed: 15,   /* ตรวจเสร็จแล้ว */
 
-                        const start = new Date(this.startDate);
-                        const end = new Date(this.endDate);
+                // 2. ฟังก์ชันสูตรคิดเปอร์เซ็นต์สดบนหน้าจอ ป้องกันการหารด้วยศูนย์ (Division by zero)
+                getPercent(current, total) {
+                    if (!total || total === 0) return 0;
+                    return Math.round((current / total) * 100);
+                },
 
-                        // เช็กกรณีผู้ใช้เลือกวันเริ่มต้น หลัง วันสิ้นสุด
-                        if (start > end) {
-                            this.errorMessage = '❌ วันเริ่มต้องไม่เกินวันสิ้นสุดครับ';
-                            return false;
-                        }
+                // 1. ตั้งค่าเริ่มต้นให้เป็นวันที่ปัจจุบัน และย้อนหลังไป 7 วัน
+                initDates() {
+                    const today = new Date();
+                    const sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(today.getDate() - 7);
 
-                        // คำนวณความต่างของเวลา (มิลลิวินาที)
-                        const diffTime = Math.abs(end - start);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    this.endDate = today.toISOString().split('T')[0];
+                    this.startDate = sevenDaysAgo.toISOString().split('T')[0];
 
-                        // ตรวจเงื่อนไขห้ามเกิน 31 วัน (1 เดือน)
-                        if (diffDays > 31) {
-                            this.errorMessage = `❌ เลือกช่วงวันที่ห่างกันได้ไม่เกิน 1 เดือน (คุณเลือก ${diffDays} วัน)`;
-                            return false;
-                        }
+                    // ดึงข้อมูลครั้งแรกเมื่อโหลดหน้าเว็บ
+                    this.fetchData();
+                },
 
-                        return true;
-                    },
+                // 2. ฟังก์ชันตรวจสอบห้ามเลือกเกิน 1 เดือน
+                validateRange() {
+                    this.errorMessage = '';
 
-                    // 3. ฟังก์ชันยิง API ดึงข้อมูลตามช่วงวันที่เลือก
-                    async fetchData() {
-                        if (!this.validateRange()) return;
+                    if (!this.startDate || !this.endDate) return;
 
-                        console.log(`ดึงข้อมูลตั้งแต่วันที่: ${this.startDate} ถึง ${this.endDate}`);
+                    const start = new Date(this.startDate);
+                    const end = new Date(this.endDate);
 
-                        // ตัวอย่าง: ยิง fetch ไปยัง backend ของคุณ
-                        // const res = await fetch(`/api/dashboard?start=${this.startDate}&end=${this.endDate}`);
-                        // const data = await res.json();
-
-                        // จำลองข้อมูลที่ได้กลับมาแสดงผลบนการ์ด
-                        this.metrics = {
-                            total: Math.floor(Math.random() * 50) + 10,
-                            inProgress: Math.floor(Math.random() * 10),
-                            completed: Math.floor(Math.random() * 20)
-                        };
+                    // เช็กกรณีผู้ใช้เลือกวันเริ่มต้น หลัง วันสิ้นสุด
+                    if (start > end) {
+                        this.errorMessage = '❌ วันเริ่มต้องไม่เกินวันสิ้นสุดครับ';
+                        return false;
                     }
+
+                    // คำนวณความต่างของเวลา (มิลลิวินาที)
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    // ตรวจเงื่อนไขห้ามเกิน 31 วัน (1 เดือน)
+                    if (diffDays > 31) {
+                        this.errorMessage = `❌ เลือกช่วงวันที่ห่างกันได้ไม่เกิน 1 เดือน (คุณเลือก ${diffDays} วัน)`;
+                        return false;
+                    }
+
+                    return true;
+                },
+
+                // 3. ฟังก์ชันยิง API ดึงข้อมูลตามช่วงวันที่เลือก
+                async fetchData() {
+                    if (!this.validateRange()) return;
+
+                    console.log(`ดึงข้อมูลตั้งแต่วันที่: ${this.startDate} ถึง ${this.endDate}`);
+
+                    // ตัวอย่าง: ยิง fetch ไปยัง backend ของคุณ
+                    // const res = await fetch(`/api/dashboard?start=${this.startDate}&end=${this.endDate}`);
+                    // const data = await res.json();
+
+                    // จำลองข้อมูลที่ได้กลับมาแสดงผลบนการ์ด
+                    this.metrics = {
+                        total: Math.floor(Math.random() * 50) + 10,
+                        inProgress: Math.floor(Math.random() * 10),
+                        completed: Math.floor(Math.random() * 20)
+                    };
                 }
             }
-        };
+        }
+    };
 
 
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('flowbiteChartComponent', () => ({
-                // กำหนดข้อมูลตัวแปรสถิติของคุณ
-                total: 25,
-                pending: 10,
-                completed: 15,
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('flowbiteChartComponent', () => ({
+            // กำหนดข้อมูลตัวแปรสถิติของคุณ
+            total: 25,
+            pending: 10,
+            completed: 15,
 
-                init() {
-                    // รอให้ DOM และ x-ref เรนเดอร์บนเบราว์เซอร์เสร็จสิ้นก่อนวาดกราฟ
-                    this.$nextTick(() => {
-                        const options = {
-                            series: [
-                                {
-                                    name: 'กำลังตรวจ / รอแก้ไข',
-                                    data: [this.pending],
-                                    color: '#FBBF24' // สีเหลืองส้ม (40%)
-                                },
-                                {
-                                    name: 'ตรวจเสร็จแล้ว',
-                                    data: [this.completed],
-                                    color: '#10B981' // สีเขียว (60%)
-                                }
-                            ],
-                            chart: {
-                                type: 'bar',
-                                height: 50, // ปรับความสูงกราฟให้แบนติดแนวราบ
-                                stacked: true, // เปิดโหมดรวมแท่งให้ซ้อนต่อท้ายกัน
-                                stackType: 'normal',
-                                sparkline: {
-                                    enabled: true // โหมดซ่อนเส้นกริด แกนตัวเลข และขอบ เพื่อความคลีนสไตล์ Flowbite
-                                },
-                                toolbar: { show: false }
+            init() {
+                // รอให้ DOM และ x-ref เรนเดอร์บนเบราว์เซอร์เสร็จสิ้นก่อนวาดกราฟ
+                this.$nextTick(() => {
+                    const options = {
+                        series: [
+                            {
+                                name: 'กำลังตรวจ / รอแก้ไข',
+                                data: [this.pending],
+                                color: '#FBBF24' // สีเหลืองส้ม (40%)
                             },
-                            plotOptions: {
-                                bar: {
-                                    horizontal: true, // สั่งให้แท่งกราฟยืดเป็นแนวนอน
-                                    barHeight: '100%', // ความหนาของแถบกราฟเต็มพื้นที่บรรจุ
-                                    borderRadius: 0 // ตัดความโค้งมนออกเพื่อให้แท่งสองสีต่อชนกันสนิท
-                                }
-                            },
-                            stroke: { width: 0 },
-                            states: {
-                                hover: { filter: { type: 'none' } }
-                            },
-                            tooltip: {
-                                enabled: true,
-                                x: { show: false },
-                                y: {
-                                    formatter: (val) => `${val} งาน (${Math.round((val / this.total) * 100)}%)`
-                                }
+                            {
+                                name: 'ตรวจเสร็จแล้ว',
+                                data: [this.completed],
+                                color: '#10B981' // สีเขียว (60%)
                             }
-                        };
+                        ],
+                        chart: {
+                            type: 'bar',
+                            height: 50, // ปรับความสูงกราฟให้แบนติดแนวราบ
+                            stacked: true, // เปิดโหมดรวมแท่งให้ซ้อนต่อท้ายกัน
+                            stackType: 'normal',
+                            sparkline: {
+                                enabled: true // โหมดซ่อนเส้นกริด แกนตัวเลข และขอบ เพื่อความคลีนสไตล์ Flowbite
+                            },
+                            toolbar: { show: false }
+                        },
+                        plotOptions: {
+                            bar: {
+                                horizontal: true, // สั่งให้แท่งกราฟยืดเป็นแนวนอน
+                                barHeight: '100%', // ความหนาของแถบกราฟเต็มพื้นที่บรรจุ
+                                borderRadius: 0 // ตัดความโค้งมนออกเพื่อให้แท่งสองสีต่อชนกันสนิท
+                            }
+                        },
+                        stroke: { width: 0 },
+                        states: {
+                            hover: { filter: { type: 'none' } }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            x: { show: false },
+                            y: {
+                                formatter: (val) => `${val} งาน (${Math.round((val / this.total) * 100)}%)`
+                            }
+                        }
+                    };
 
-                        // สั่งเรนเดอร์กราฟใส่ Element ผ่าน x-ref ของ Alpine
-                        const chart = new ApexCharts(this.$refs.chartTimeline, options);
-                        chart.render();
-                    });
-                }
-            }));
-        });
+                    // สั่งเรนเดอร์กราฟใส่ Element ผ่าน x-ref ของ Alpine
+                    const chart = new ApexCharts(this.$refs.chartTimeline, options);
+                    chart.render();
+                });
+            }
+        }));
+    });
 
-        // สั่งรันคำสั่งเริ่มต้นทำงานของหน้าตัวเอง
-        window.dashboardPage.init();
+    // สั่งรันคำสั่งเริ่มต้นทำงานของหน้าตัวเอง
+    window.dashboardPage.init();
 
-        // 🧹 ทำความสะอาดถุงข้อมูลเมื่อผู้ใช้กระโดดหนีไปเปิดเมนูหน้าอื่น เพื่อสุขอนามัยของแรมเครื่องคอมพิวเตอร์
-        window.currentPageCleanup = function () {
-            console.log("🧹 ล้างคลังความจำเฉพาะของหน้า Dashboard ออกเรียบร้อย");
-            window.dashboardPage = null;
-        };
-    </script>
+    // 🧹 ทำความสะอาดถุงข้อมูลเมื่อผู้ใช้กระโดดหนีไปเปิดเมนูหน้าอื่น เพื่อสุขอนามัยของแรมเครื่องคอมพิวเตอร์
+    window.currentPageCleanup = function () {
+        console.log("🧹 ล้างคลังความจำเฉพาะของหน้า Dashboard ออกเรียบร้อย");
+        window.dashboardPage = null;
+    };
+</script>

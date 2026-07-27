@@ -40,7 +40,7 @@ const SystemService = {
                 "menus" :   [
                         { "id": "dashboard", "title": "ภาพรวมระบบ", "icon": "📊", "path": "dashboard.html" },
                         { "id": "defect", "title": "ใบงาน Defect", "icon": "📋", "path": "modules/transaction/defect.html" },
-                         { "id": "defect", "title": "Defect_log", "icon": "📋", "path": "modules/transaction/defect_log.html" },
+                         { "id": "defect1", "title": "Defect_log", "icon": "📋", "path": "modules/transaction/defect_log.html" },
                         { "id": "tx_checklist", "title": "ใบงาน Checklist (Tx)", "icon": "📋", "path": "modules/transaction/transaction.css" }
                     
                        ,
