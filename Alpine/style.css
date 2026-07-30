@@ -12,14 +12,7 @@ body {
 
 
 
-.card-main {
-    padding: 0.5rem; /* เทียบเท่า p-6 */
-      background-color: #e8e7eb; /* เทียบเท่า bg-white */
-    border-width: 1px; /* เทียบเท่า border */
-    border-color: #f3f4f6; /* เทียบเท่า border-gray-100 */
-    border-radius: 1rem; /* เทียบเท่า rounded-2xl */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* เทียบเท่า shadow-xs */
-}
+ 
 
 
 .card-search {

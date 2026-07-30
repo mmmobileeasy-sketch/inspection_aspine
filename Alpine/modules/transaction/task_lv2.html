@@ -1,0 +1,367 @@
+<div id="task-lv2" x-data="{
+    openModal: false,
+            client: {
+                name: 'คุณ สมชาย รักดี',
+                email: 'somchai.r@email.com',
+                regDate: '15 มีนาคม 2569',
+                phone: '081-234-5678',
+                lineId: 'somchai_r',
+                note: 'ลูกค้าเน้นตรวจงานระบบไฟเป็นพิเศษ'
+            },
+            projects: [
+                { id: '#PJ-001', type: 'ตรวจอย่างเดียว', name: 'คอนโด ABC (ชั้น 12 ห้อง 1204)', status: 'อยู่ระหว่างรอบ 2', statusColor: 'bg-red-500' },
+                { id: '#PJ-042', type: 'ตรวจอย่างเดียว', name: 'บ้านเดี่ยว XYZ (แปลง B3)', status: 'ปิดงานแล้ว (รอบ 3)', statusColor: 'bg-green-500' },
+                { id: '#PJ-089', type: 'ตรวจและซ่อมเอง', name: 'อาคารพาณิชย์ตึกแถว จรัญฯ', status: 'กำลังซ่อมแซม', statusColor: 'bg-yellow-500' }
+            ],
+            addProject() {
+                const newId = '#PJ-' + String(this.projects.length + 1).padStart(3, '0');
+                this.projects.push({
+                    id: newId,
+                    type: 'ตรวจอย่างเดียว',
+                    name: 'โครงการใหม่ที่กำลังเพิ่ม...',
+                    status: 'รอดำเนินการ',
+                    statusColor: 'bg-gray-400'
+                });
+                  this.openModal = false;
+            }
+         }">
+
+    <!-- 📌 ข้อมูลส่วนตัวลูกค้า (Client Info) -->
+    <div class="w-full mb-5 bg-white rounded-xl border border-gray-300 shadow-xs overflow-hidden mt-4">
+
+        <!-- ⬜ 1. แถบคาดหัวข้อสีเทาอ่อน (เปลี่ยนจากสีน้ำเงินเข้มเดิม) -->
+        <!-- ใช้ bg-gray-100 หรือ bg-slate-100 และเปลี่ยนข้อความเป็นสีเข้ม text-gray-800 -->
+        <div class="bg-gray-100 px-2 py-3 flex items-center gap-2 text-gray-800 border-b border-gray-200 font-sans">
+            <span class="text-sm">👤</span>
+            <h2 class="font-bold text-sm tracking-wide">ข้อมูลส่วนตัวลูกค้า (Client Info)</h2>
+        </div>
+
+        <hr class="border-dashed border-gray-300 mb-4">
+
+        <!-- ⬜ ส่วนรายละเอียดข้อมูลด้านใน (เปลี่ยนมาใช้ระบบ Grid 12 ช่องเมื่อจอใหญ่ขึ้น) -->
+        <!-- บนมือถือเรียงเป็น 1 คอลัมน์แนวดิ่ง (grid-cols-1) พอจอใหญ่ตั้งแต่ sm ขึ้นไปเปิดระบบ 12 ช่อง (sm:grid-cols-12) -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-x-6 gap-y-3 text-xs sm:text-sm font-sans p-2">
+
+            <!-- 👤 แถวที่ 1: ชื่อ-นามสกุล (ฝั่งซ้ายกว้าง 7 ช่อง) -->
+            <div class="sm:col-span-5">
+                <span class="text-gray-500 font-medium">ชื่อ-นามสกุล:</span>
+                <span class="text-gray-900 font-bold ml-1" x-text="client.name">คุณ สมชาย รักดี</span>
+            </div>
+            <!-- 📞 แถวที่ 1: เบอร์โทร (ฝั่งขวากว้าง 5 ช่อง) -->
+            <div class="sm:col-span-7">
+                <span class="text-gray-500 font-medium">เบอร์โทร:</span>
+                <span class="text-gray-900 font-bold ml-1" x-text="client.phone">081-234-5678</span>
+            </div>
+
+            <!-- ✉️ แถวที่ 2: อีเมล (ฝั่งซ้ายกว้าง 7 ช่อง) -->
+            <div class="sm:col-span-5">
+                <span class="text-gray-500 font-medium">อีเมล:</span>
+                <span class="text-gray-900 ml-1" x-text="client.email">somchai.r@email.com</span>
+            </div>
+            <!-- 💬 แถวที่ 2: Line ID (ฝั่งขวากว้าง 5 ช่อง) -->
+            <div class="sm:col-span-7">
+                <span class="text-gray-500 font-medium">Line ID:</span>
+                <span class="text-gray-900 ml-1" x-text="client.lineId">somchai_r</span>
+            </div>
+
+            <!-- 📅 แถวที่ 3: วันที่ลงทะเบียน (กินพื้นที่ยาวไปเลย 12 ช่องเต็ม หรือจะหดเหลือ 7 ก็ได้ครับ) -->
+            <div class="sm:col-span-12">
+                <span class="text-gray-500 font-medium">วันที่ลงทะเบียน:</span>
+                <span class="text-gray-900 ml-1" x-text="client.regDate">15 มีนาคม 2569</span>
+            </div>
+
+            <!-- 📝 แถวที่ 4: โน้ตย่อสีส้ม (แผ่เต็มความกว้าง 12 ช่อง) -->
+            <div class="sm:col-span-12 text-orange-600 font-medium mt-1">
+                Note: <span x-text="client.note">ลูกค้าเน้นตรวจงานระบบไฟเป็นพิเศษ</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 🗂️ รายการใบงานหลักทั้งหมดของลูกค้าคนนี้ (Layer 2 - Projects) -->
+    <div class="w-full mb-5 bg-white rounded-xl border border-gray-300 shadow-xs overflow-hidden mt-4">
+
+        <!-- 📁 ส่วนหัวข้อรายการใบงาน และปุ่มเปิดใบงานด้านขวา -->
+        <div class="bg-gray-100 px-2 py-3 flex items-center gap-2 text-gray-800 border-b border-gray-200 font-sans">
+            <div class="flex items-center gap-2 text-amber-500 font-bold text-sm sm:text-base">
+                <span>🗂️</span>
+                <h2>รายการใบงาน</h2>
+            </div>
+            <button @click="openModal = true"
+                class="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-medium rounded border border-gray-300 font-mono">
+                [ ➕ เปิดใบงาน ]
+            </button>
+        </div>
+        <hr class="border-dashed border-gray-300 mb-4">
+        <!-- ========================================== -->
+        <!-- 🔍 บล็อกค้นหาและตัวกรองสถานะ (ย้ายไปเกาะกลุ่มฝั่งขวา) -->
+        <!-- ========================================== -->
+        <!-- ใช้ flex-col บนมือถือ และ flex-row บนคอมเพื่อจัดกลุ่มชิดขวาด้วย justify-end -->
+        <div class="mb-4 flex flex-col sm:flex-row sm:justify-start items-center gap-2 p-2">
+
+            <!-- 1. Dropdown เลือกสถานะล่าสุด -->
+            <div class="w-full sm:w-44">
+                <select
+                    class="w-full p-2 bg-gray-50 border border-gray-300 rounded text-xs focus:outline-hidden text-gray-600 font-sans">
+                    <option value="">📋 แสดงทุกสถานะ</option>
+                    <option value="pending">🔴 อยู่ระหว่างรอบ 2</option>
+                    <option value="success">🟢 ปิดงานแล้ว</option>
+                    <option value="progress">🟡 กำลังซ่อมแซม</option>
+                </select>
+            </div>
+
+            <!-- 2. ช่องพิมพ์ค้นหา (ปรับขนาดให้กระชับพอดีๆ ไม่ยาวเกินไป) -->
+            <div class="w-full sm:w-64 relative">
+                <input type="text" placeholder="พิมพ์เลขใบงาน, ชื่อโครงการ..."
+                    class="w-full p-2 pl-3 bg-gray-50 border border-gray-300 rounded text-xs focus:outline-hidden focus:border-gray-500 font-sans transition-colors">
+            </div>
+
+            <!-- 3. ปุ่มกดค้นหา (Search Button) สไตล์มินิมอล -->
+            <button
+                class="w-full sm:w-auto px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white text-xs font-medium rounded border border-gray-800 transition-colors font-mono shrink-0 shadow-xs">
+                [ ค้นหา ]
+            </button>
+
+        </div>
+
+        <!-- Responsive Table Structure -->
+        <div class="overflow-x-auto p-2">
+            <div class="hidden lg:block overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-300 text-gray-500">
+                            <th class="py-2 px-3">เลขที่ใบงาน</th>
+                            <th class="py-2 px-3">ประเภทใบงาน</th>
+                            <th class="py-2 px-3">ชื่อโครงการ/สถานที่</th>
+                            <th class="py-2.5 px-3 text-center">ระยะเวลาทำงาน</th>
+                            <th class="py-2.5 px-3 text-center">จำนวน Defect</th>
+                            <th class="py-2 px-3">สถานะล่าสุด</th>
+                            <th class="py-2.5 px-3 text-center">การเซ็นชื่อ</th>
+                            <th class="py-2 px-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="project in projects" :key="project.id">
+                            <tr class="border-b border-dashed border-gray-200 hover:bg-gray-50">
+                                <td class="py-3 px-3 font-mono font-medium text-gray-700" x-text="'| ' + project.id">
+                                </td>
+                                <td class="py-3 px-3 text-gray-600" x-text="project.type"></td>
+                                <td class="py-3 px-3 text-gray-800" x-text="project.name"></td>
+                                <td class="py-3 px-3 text-center text-xs">
+                                    <div class="font-medium text-gray-700">15 มี.ค. 69</div>
+                                    <div class="text-[11px] text-gray-400">
+                                        ถึง 22 มี.ค. 69
+                                        <span class="text-gray-500 font-medium ml-0.5">(7 วัน)</span>
+                                        <!-- ⏱️ เพิ่มวงเล็บจำนวนวันตรงนี้ -->
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3 text-center">
+                                    <span
+                                        class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
+                                        15 จุด
+                                    </span>
+                                </td>
+                                <td class="py-3 px-3">
+                                    <div class="flex items-center gap-2">
+                                        <span>|</span>
+                                        <span class="w-3 h-3 rounded-full inline-block"
+                                            :class="project.statusColor"></span>
+                                        <span x-text="project.status"></span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3 text-center">
+                                    <span
+                                        class="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-500 border border-gray-300">
+                                        ⏳ รอเซ็นชื่อ
+                                    </span>
+                                </td>
+                                <td class="py-2 px-3 text-center">
+                                    <div class="inline-flex items-center gap-1">
+
+                                        <!-- ปุ่ม Edit: กดแล้วสั่งเปิด Dialog ฟอร์มแก้ไขได้ (ผูก openModal = true ได้เลย) -->
+                                        <button @click="openModal = true"
+                                            class="px-2 py-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-600 rounded text-[11px] font-mono transition-colors shadow-xs">
+                                            ✏️ แก้ไข
+                                        </button>
+                                        <!-- ปุ่ม Next: สำหรับกดลิงก์เข้าไปดูรายละเอียดดีเฟกต์ด้านในของห้องนี้ -->
+                                        <button
+                                            class="px-2 py-1 bg-gray-800 hover:bg-gray-900 text-white border border-gray-800 rounded text-[11px] font-mono transition-colors shadow-xs">
+                                            ➡️ไปต่อ
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 📱 [MOBILE MODE] ซ่อนบนจอใหญ่ แสดงเฉพาะจอมือถือ (ต่ำกว่า lg) -->
+            <!-- สลับมาแสดงผลเป็น List Card ตามที่เราเคยคุยกันใน Turn แรกๆ ครับ -->
+            <div class="block lg:hidden space-y-3">
+                <template x-for="project in projects" :key="project.id">
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex flex-col gap-2 relative">
+                        <div class="flex justify-between items-start">
+                            <span class="font-mono font-bold text-gray-700 text-xs" x-text="project.id"></span>
+                             
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-0 rounded-full bg-green-50 border border-green-200 text-green-700 font-semibold text-[11px]">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                    ปิดงานแล้ว (รอบ 3)
+                                </span>
+                             
+
+                            <span class="text-[11px] bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-600"
+                                x-text="project.type"></span>
+                        </div>
+                        <div class="text-gray-900 font-medium text-xs sm:text-sm" x-text="project.name"></div>
+                        <!-- เพิ่มข้อมูล Note, วันที่ และจำนวนดีเฟกต์ลงในการ์ดมือถือตัวนี้ -->
+                        <div
+                            class="text-[11px] text-gray-500 grid grid-cols-2 gap-y-1 bg-white p-2 rounded border border-gray-100 my-1">
+                            <div>📅 <span x-text="project.date || '15 มี.ค. 69'"></span></div>
+                            <div class="text-right">⏱️ <span class="font-medium text-gray-700">(7 วัน)</span></div>
+                            <div>❌ Defect: <span class="font-bold text-amber-600">15 จุด</span></div>
+                            <div class="text-right">✍️ <span class="text-gray-400">รอเซ็นชื่อ</span></div>
+                        </div>
+                        <div
+                            class="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-gray-200 font-mono text-center text-xs">
+
+                            <!-- ปุ่มแก้ไข: กดแล้วจะสั่งเปิดหน้าต่าง Dialog เดิมขึ้นมาเพื่อเตรียมแก้ข้อมูล -->
+                            <button @click="openModal = true"
+                                class="w-full py-2 bg-white hover:bg-gray-100 text-gray-700 font-medium rounded border border-gray-300 transition-colors">
+                                [ ✏️ แก้ไข ]
+                            </button>
+
+                            <!-- ปุ่มไปต่อ: สไตล์สีเข้มหรูหรา สำหรับกดลิงก์ผ่านหน้างานไปดูสถิติรายละเอียด Defect ด้านใน -->
+                            <button
+                                class="w-full py-2 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded border border-gray-800 transition-colors">
+                                [ ไปต่อ ➡️ ]
+                            </button>
+
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+
+
+            <div
+                class="mb-6 pt-4 border-t border-dashed border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+
+                <!-- ฝั่งซ้าย: แสดงข้อมูลจำนวนแถวปัจจุบัน -->
+                <div>
+                    แสดง <span class="font-medium text-gray-800">1</span> ถึง
+                    <span class="font-medium text-gray-800">3</span> จากทั้งหมด
+                    <span class="font-medium text-gray-800">3</span> รายการ
+                </div>
+
+                <!-- ฝั่งขวา: ปุ่มกดเปลี่ยนหน้าสไตล์เหลี่ยมมินิมอลเข้ากับดีไซน์ระบบ -->
+                <div class="flex items-center gap-1 font-mono">
+                    <!-- ปุ่มย้อนกลับ (Previous) -->
+                    <button
+                        class="px-2.5 py-1 bg-white border border-gray-200 text-gray-400 rounded cursor-not-allowed text-[11px]"
+                        disabled>
+                        [ &lt; ก่อนหน้า ]
+                    </button>
+
+                    <!-- เลขหน้าปัจจุบัน (Active) -->
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-white border border-gray-800 rounded font-bold text-[11px]">
+                        1
+                    </button>
+
+                    <!-- ปุ่มหน้าถัดไป (Next) -->
+                    <button
+                        class="px-2.5 py-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded transition-colors text-[11px]">
+                        [ ถัดไป &gt; ]
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- ========================================== -->
+    <!-- 🔲 DIALOG COMPONENT (ซ่อนไว้เริ่มต้น) -->
+    <!-- ========================================== -->
+    <div x-show="openModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" style="display: none;">
+
+        <!-- 1. ฉากหลังมืดโปร่งแสง (Backdrop) คลิกแล้วปิดได้ -->
+        <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs" @click="openModal = false"></div>
+
+        <!-- 2. ตัวกล่องฟอร์ม Dialog (ความกว้างพอดีสายตาบน Notebook) -->
+        <div
+            class="bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-lg p-6 relative z-10 font-sans text-sm">
+
+            <!-- หัวข้อ Dialog -->
+            <div class="flex items-center justify-between pb-3 border-b border-dashed border-gray-200 mb-4">
+                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                    <span>➕</span> เปิดใบงานหลักชิ้นใหม่
+                </h3>
+                <button @click="openModal = false" class="text-gray-400 hover:text-gray-600 font-mono">[ X ]</button>
+            </div>
+
+            <!-- ฟอร์มกรอกข้อมูล -->
+            <form class="space-y-4">
+                <!-- ชื่อโครงการ -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">• ชื่อโครงการ / สถานที่</label>
+                    <input type="text" placeholder="เช่น คอนโด ABC ชั้น 12 ห้อง 1204"
+                        class="w-full p-2 bg-gray-50 border border-gray-300 rounded text-xs focus:outline-hidden focus:border-gray-500">
+                </div>
+
+                <!-- ประเภทใบงาน -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">• ประเภทใบงาน</label>
+                    <select class="w-full p-2 bg-gray-50 border border-gray-300 rounded text-xs focus:outline-hidden">
+                        <option>ตรวจอย่างเดียว</option>
+                        <option>ตรวจและซ่อมเอง</option>
+                    </select>
+                </div>
+
+                <!-- การเลือกวันที่ทำงาน (มีผลต่อสูตรคำนวณจำนวนวันที่คุยกันก่อนหน้า) -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">• วันที่เริ่มต้น</label>
+                        <input type="date"
+                            class="w-full p-2 bg-gray-50 border border-gray-300 rounded text-xs focus:outline-hidden">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">• วันที่สิ้นสุด</label>
+                        <input type="date"
+                            class="w-full p-2 bg-gray-50 border border-gray-300 rounded text-xs focus:outline-hidden">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">• โน้ตย่อใบงาน (Note)</label>
+                    <textarea rows="2" placeholder="กรอกหมายเหตุหรือข้อความสั้นประจำใบงานชิ้นนี้..."
+                        class="w-full p-2 bg-gray-50 border border-gray-300 rounded text-xs focus:outline-hidden focus:border-gray-500"></textarea>
+                </div>
+            </form>
+
+            <!-- ปุ่มกดยืนยัน / ยกเลิก ด้านล่าง -->
+            <div class="mt-6 pt-4 border-t border-dashed border-gray-200 flex justify-end gap-2 font-mono text-xs">
+                <button @click="openModal = false"
+                    class="px-4 py-2 bg-white border border-gray-300 rounded text-gray-600 hover:bg-gray-50 transition-colors">
+                    [ ยกเลิก ]
+                </button>
+                <button @click="addProject()"
+                    class="px-4 py-2 bg-gray-800 border border-gray-800 rounded text-white hover:bg-gray-900 transition-colors font-bold">
+                    [ ✔ บันทึกใบงาน ]
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>

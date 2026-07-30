@@ -4,7 +4,7 @@ const SystemService = {
 
     async login(domain, username, password) {
         // ดึง URL ตัวหลักมาจากไฟล์ตั้งค่าระบบกลาง (เช่น https://yourdomain.com)
-      //  const baseUrl = window.SystemConfig.getApiBaseUrl();
+        //  const baseUrl = window.SystemConfig.getApiBaseUrl();
 
         try {
             // const response = await fetch(`${baseUrl}/auth/login`, {
@@ -28,22 +28,27 @@ const SystemService = {
             // // เคสที่ 2: ล็อกอินผ่านฉลุย ดึงข้อมูลดิบออกมา
             // const result = await response.json();
 
-             await new Promise(resolve => setTimeout(resolve, 200));
-            return [
-            {
-                "token": "eyJhbGciOiJIUzI1NiIsInR5...",
-                "current_role": "mechanic",
-                "roles": [
-                    { "id": "mechanic", "title": "ช่างเทคนิคหน้างาน" },
-                    { "id": "qa_supervisor", "title": "หัวหน้าผู้ควบคุมงาน (QA)" }
-                ],
-                "menus" :   [
-                        { "id": "dashboard", "title": "ภาพรวมระบบ", "icon": "📊", "path": "dashboard.html" },
+            await new Promise(resolve => setTimeout(resolve, 200));
+             const result = [
+                {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5...",
+                    "current_role": "admin",
+                    "current_menu" : "dashboard_admin",
+                    "roles": [
+                        { "id": "mechanic", "title": "ช่างเทคนิคหน้างาน" },
+                        { "id": "qa_supervisor", "title": "หัวหน้าผู้ควบคุมงาน (QA)" }
+                    ],
+                    "menus": [
+                          { "id": "tasklv2", "title": "tasklv2", "icon": "📊", "path": "modules/transaction/task_lv2.html" },
+                        { "id": "dashboard_admin", "title": "ภาพรวมระบบ (Admin)", "icon": "📊", "path": "dashboard_admin.html" },
+                        { "id": "dashboard_manager", "title": "ภาพรวมระบบ (Manager)", "icon": "📊", "path": "dashboard_manager.html" },
+                        { "id": "dashboard_inspection", "title": "ภาพรวมระบบ (Inpection)", "icon": "📊", "path": "dashboard_inspection.html" },
+                        { "id": "dashboard_staff", "title": "ภาพรวมระบบ (Staff)", "icon": "📊", "path": "dashboard_staff.html" },
                         { "id": "defect", "title": "ใบงาน Defect", "icon": "📋", "path": "modules/transaction/defect.html" },
-                         { "id": "defect1", "title": "Defect_log", "icon": "📋", "path": "modules/transaction/defect_log.html" },
+                        { "id": "defect1", "title": "Defect_log", "icon": "📋", "path": "modules/transaction/defect_log.html" },
                         { "id": "tx_checklist", "title": "ใบงาน Checklist (Tx)", "icon": "📋", "path": "modules/transaction/transaction.css" }
-                    
-                       ,
+
+                        ,
                         {
                             "id": "qa_group1",
                             "title": "จัดการข้อมูลส่วนกลาง",
@@ -69,7 +74,7 @@ const SystemService = {
                             ]
                         },
 
-                          {
+                        {
                             "id": "qa_task3",
                             "title": "ระบบปฏิบัติงานและการติดตาม",
                             "icon": "🛡️",
@@ -83,20 +88,17 @@ const SystemService = {
                         },
                         { "id": "report_pdf", "title": "ออกรายงาน PDF", "icon": "📄", "path": "modules/report/report.css" }
                     ]
-                
-            }
-        ];
+
+                }
+            ];
 
 
-
+        
 
             // 🎯 บันทึกรหัส Token ลับประจำตัวช่างลงในหน่วยความจำเครื่องปลอดภัย (เซฟแยกตระกร้าตามโดเมน)
-            localStorage.setItem(`${domain}_auth_token`, result.token);
+            localStorage.setItem(`${domain}`, result);
 
-            return {
-                success: true,
-                menus: result.menus
-            };
+            return result;
 
         } catch (error) {
             window.SystemConfig.log('การล็อกอินขัดข้อง:', error.message);
@@ -149,7 +151,7 @@ const SystemService = {
 
         } catch (error) {
             window.SystemConfig.log('การรีเฟรชเซสชันขัดข้อง:', error.message);
-            
+
             // 🚫 Fallback Mode: ส่งข้อมูลจำลองกรณี Dev Mode ช่างเดินเข้าจุดไม่มีเน็ตตอนเปิดแอป
             return {
                 success: window.SystemConfig.ENVIRONMENT === 'development', // ถ้าอยู่ช่วงพัฒนาให้ผ่านฉลุย
@@ -190,62 +192,62 @@ const SystemService = {
     // 💡 คุณสามารถย้ายพวก API โหลด Config ของ Tenant มาเก็บไว้ที่นี่ร่วมกันได้ด้วย
     async getTenantConfig(domain) {
         // ==========================================
-    // 🔴 [โหมดใช้งานจริง] ยิง API ไปที่หลังบ้าน (Server)
-    // ==========================================
-    /* -- เอาคอมเมนต์บล็อกนี้ออก เมื่อต้องการใช้ API จริง --
-    let response = await fetch(`/api/tenant/config?domain=${domain}`);
-    
-    // เช็กสถานะจากเซิร์ฟเวอร์ ถ้าตอบกลับมาไม่สำเร็จ (เช่น 404, 500) ให้โยน Error ทันที
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    // แปลงข้อมูลผลลัพธ์ JSON ส่งกลับไป
-    return await response.json();
-    ---------------------------------------------------- */
-
-
-    // ==========================================
-    // 🟡 [โหมดพัฒนา/ทดสอบ] จำลองข้อมูล (Mock Data)
-    // ==========================================
-    // 1. จำลองความหน่วงของเน็ตให้หน้าจอหมุนโหลด 0.5 วินาที
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // 💡 สวิตช์ทดสอบระบบพัง: เปลี่ยนเป็น true เพื่อเช็กว่าหน้าเว็บตอนติด Error (catch บล็อก) แสดงผลถูกต้องไหม
-    const simulateError = false; 
-    if (simulateError) {
-        throw new Error("500 Internal Server Error (Simulated)");
-    }
-
-    // 2. คลังข้อมูลจำลองแยกตามชื่อ Domain ที่พิมพ์บน Browser URL
-    const mockTenants = {
-        'localhost': {
-            tenantId: 'tenant_001',
-            companyName: 'Local Development Corp',
-            theme: 'dark',
-            VERSION: '1.0.0-dev',
-            defaultPageHtml: '<h1>ยินดีต้อนรับสู่ระบบ Local (Dev)</h1>'
-        },
-        '127.0.0.1': {
-            tenantId: 'tenant_001_ip',
-            companyName: 'Local IP Enterprise',
-            theme: 'dark',
-            VERSION: '1.0.0-ip',
-            defaultPageHtml: '<h1>ยินดีต้อนรับผ่าน IP 127.0.0.1</h1>'
-        },
-        'fastcheck.com': {
-            tenantId: 'tenant_002',
-            companyName: 'Fast Check Co., Ltd.',
-            theme: 'light',
-            VERSION: '2.4.1',
-            defaultPageHtml: '<h1>ยินดีต้อนรับสู่ระบบ Fast Check</h1>'
+        // 🔴 [โหมดใช้งานจริง] ยิง API ไปที่หลังบ้าน (Server)
+        // ==========================================
+        /* -- เอาคอมเมนต์บล็อกนี้ออก เมื่อต้องการใช้ API จริง --
+        let response = await fetch(`/api/tenant/config?domain=${domain}`);
+        
+        // เช็กสถานะจากเซิร์ฟเวอร์ ถ้าตอบกลับมาไม่สำเร็จ (เช่น 404, 500) ให้โยน Error ทันที
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    };
+        
+        // แปลงข้อมูลผลลัพธ์ JSON ส่งกลับไป
+        return await response.json();
+        ---------------------------------------------------- */
 
-    // 3. ค้นหาข้อมูลตามโดเมนที่ส่งมา (หากไม่เจอบนรายการ ให้ดึงค่าของ localhost มาเป็นค่าเริ่มต้น)
-    const config = mockTenants[domain] || mockTenants['localhost'];
-    
-    return config;
+
+        // ==========================================
+        // 🟡 [โหมดพัฒนา/ทดสอบ] จำลองข้อมูล (Mock Data)
+        // ==========================================
+        // 1. จำลองความหน่วงของเน็ตให้หน้าจอหมุนโหลด 0.5 วินาที
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // 💡 สวิตช์ทดสอบระบบพัง: เปลี่ยนเป็น true เพื่อเช็กว่าหน้าเว็บตอนติด Error (catch บล็อก) แสดงผลถูกต้องไหม
+        const simulateError = false;
+        if (simulateError) {
+            throw new Error("500 Internal Server Error (Simulated)");
+        }
+
+        // 2. คลังข้อมูลจำลองแยกตามชื่อ Domain ที่พิมพ์บน Browser URL
+        const mockTenants = {
+            'localhost': {
+                tenantId: 'tenant_001',
+                companyName: 'Local Development Corp',
+                theme: 'dark',
+                VERSION: '1.0.0-dev',
+                defaultPageHtml: '<h1>ยินดีต้อนรับสู่ระบบ Local (Dev)</h1>'
+            },
+            '127.0.0.1': {
+                tenantId: 'tenant_001_ip',
+                companyName: 'Local IP Enterprise',
+                theme: 'dark',
+                VERSION: '1.0.0-ip',
+                defaultPageHtml: '<h1>ยินดีต้อนรับผ่าน IP 127.0.0.1</h1>'
+            },
+            'fastcheck.com': {
+                tenantId: 'tenant_002',
+                companyName: 'Fast Check Co., Ltd.',
+                theme: 'light',
+                VERSION: '2.4.1',
+                defaultPageHtml: '<h1>ยินดีต้อนรับสู่ระบบ Fast Check</h1>'
+            }
+        };
+
+        // 3. ค้นหาข้อมูลตามโดเมนที่ส่งมา (หากไม่เจอบนรายการ ให้ดึงค่าของ localhost มาเป็นค่าเริ่มต้น)
+        const config = mockTenants[domain] || mockTenants['localhost'];
+
+        return config;
     }
 };
 

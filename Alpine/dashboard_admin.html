@@ -1,11 +1,11 @@
 <!-- เปิดหน้าด้วยเนื้อหาหลักทันที ตั้งค่า ID เพื่อให้ปุ่มเมนูบาร์รู้ตำแหน่งและสับเปลี่ยนสีได้ถูกต้อง -->
-<div id="dashboard" class="space-y-6">
+<div id="dashboard_admin">
 
 
 
 
 
-    <div x-data="window.dashboardPage.dashboardFilter('a','b')">
+    <div x-data="window.dashboard_admin.dashboardFilter('a','b')">
 
 
         <!-- คอนเทนเนอร์หลัก ครอบคลุมพื้นที่ขวาเต็มหน้าจอ -->
@@ -370,8 +370,9 @@
 
 <script>
     // 📦 ถุงจำลองเก็บค่าฟังก์ชันคำนวณและดึงข้อมูลของหน้า Dashboard เท่านั้น
-    window.dashboardPage = {
+    window.dashboard_admin = {
         init() {
+            alert(22);
             console.log("⚡ หน้า Dashboard โหลดสำเร็จ: รันคำสั่งดึงยอดรวมสถิติตามรอบปกติ");
         },
 
@@ -522,11 +523,11 @@
     });
 
     // สั่งรันคำสั่งเริ่มต้นทำงานของหน้าตัวเอง
-    window.dashboardPage.init();
+    window.dashboard_admin.init();
 
     // 🧹 ทำความสะอาดถุงข้อมูลเมื่อผู้ใช้กระโดดหนีไปเปิดเมนูหน้าอื่น เพื่อสุขอนามัยของแรมเครื่องคอมพิวเตอร์
     window.currentPageCleanup = function () {
         console.log("🧹 ล้างคลังความจำเฉพาะของหน้า Dashboard ออกเรียบร้อย");
-        window.dashboardPage = null;
+        window.dashboard_admin = null;
     };
 </script>
